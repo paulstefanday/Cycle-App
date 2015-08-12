@@ -1,6 +1,6 @@
 var M = require('../models'),
 	config = require('./config'),
-	bcrypt = require('co-bcrypt'),
+	bcrypt = require('co-bcryptjs'),
 	randomstring = require('randomstring'),
 	thinky = require(__base+'/config/thinky.js'),
 	r = thinky.r;

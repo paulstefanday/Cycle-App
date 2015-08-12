@@ -1,6 +1,6 @@
 var   formidable = require('koa-formidable'),
       jwt = require('jsonwebtoken'),
-      bcrypt = require('co-bcrypt'),
+      bcrypt = require('co-bcryptjs'),
       config = require('../../../config/config'),
       M = require('../../../models'),
       H = require('../../../config/helpers'),
