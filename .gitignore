@@ -1,5 +1,7 @@
 rethinkdb_data/
 
+*.pem
+
 # Logs
 logs
 *.log
