@@ -1,11 +1,11 @@
 var co = require('co'),
-	H = require('../../config/helpers'),
-	M = require('../../models'),
+	H = require(__base+'/config/helpers'),
+	M = require(__base+'/models'),
 	_ = require('lodash'),
-	config = require('../../config/config'),
+	config = require(__base+'/config/config'),
 	thinky = require(__base+'/config/thinky.js'),
 	r = thinky.r,
-	fake = require('../../mock.js'),
+	fake = require(__base+'/mock.js'),
 	jwt = require('jsonwebtoken'),
 	amount = process.env.a ? process.env.a : 5;
 

@@ -8,12 +8,20 @@ var app = module.exports = require('koa')(),
     socketIo  = require('socket.io'),
     M = require('./models'),
    	route = require('koa-route'),
-   	render = require('co-render');
+   	render = require('co-render'),
+   	session = require('koa-session'),
+   	bodyParser = require('koa-bodyparser'),
+   	Grant = require('grant-koa'),
+   	grant = new Grant(config.oauth);
 
 var server, io;
 
 // Middleware
 // app.use(middleware.logs);
+app.keys = ['grant'];
+app.use(bodyParser());
+app.use(mount(grant));
+app.use(session(app));
 app.use(middleware.cors);
 app.use(middleware.errors);
 app.use(middleware.permissions);
@@ -21,6 +29,11 @@ app.use(middleware.auth);
 // app.use(middleware.render);
 
 app.use(route.get('/', function *() { this.body = yield render('views/join.jade'); }));
+
+app.use(route.get('/facebook/callback', function *(next) {
+  console.log(this.query)
+  this.body = JSON.stringify(this.query, null, 2)
+}))
 
 // HTTP routes
 app.use(mount('/api/v1', require('./api/v1/routes')));
