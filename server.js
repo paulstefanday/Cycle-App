@@ -31,8 +31,18 @@ app.use(middleware.auth);
 app.use(route.get('/', function *() { this.body = yield render('views/join.jade'); }));
 
 app.use(route.get('/facebook/callback', function *(next) {
-  console.log(this.query)
-  this.body = JSON.stringify(this.query, null, 2)
+
+  var Purest = require('purest'),
+      facebook = new Purest({provider:'facebook', promise:true}), 
+      profile;
+
+  profile = yield facebook.query()
+    .get('me')
+    .auth(this.query.access_token)
+    .request();
+
+  this.body = { token: this.query.access_token, profile: profile }
+
 }))
 
 // HTTP routes

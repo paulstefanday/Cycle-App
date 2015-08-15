@@ -32,9 +32,7 @@ module.exports = {
 	    "key": process.env.NODE_ENV ? "535096706647433" : "535124743311296",
 	    "secret": process.env.NODE_ENV ? "3b1c59ff4236ec10851ac6791432b541" : "ebe1bd018199eb66dadfc19377f6bb30",
 	    "callback": "/facebook/callback",
-	    "scope": [
-	      "email"
-	    ]
+	    "scope": [ "public_profile", "email", "user_birthday" ]
 	  }
 	}
 };
