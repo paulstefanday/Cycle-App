@@ -4,11 +4,28 @@ var   formidable = require('koa-formidable'),
       config = require('../../../config/config'),
       M = require('../../../models'),
       H = require('../../../config/helpers'),
+      Purest = require('purest'),
       randomstring = require('randomstring'),
       secret = config.secret,
       thinky = require(__base+'/config/thinky.js'),
       r = thinky.r;
 
+module.exports.facebook = function *(next) {
+
+  // Figure out details with https://developers.facebook.com/tools/explorer/ 
+  // && https://grant-oauth.herokuapp.com/#/facebook
+  
+  var facebook = new Purest({ provider: 'facebook', promise: true }), 
+      profile;
+
+  profile = yield facebook.query()
+    .get('me?fields=id,name,email,birthday')
+    .auth(this.query.access_token)
+    .request();
+
+  this.body = profile[1];
+
+}
 
 /**
  * @api {post} /api/v1/signup/ Signup

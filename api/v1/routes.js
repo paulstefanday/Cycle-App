@@ -10,6 +10,7 @@ var api = new router();
 api.post('/activity', activityCtrl.create);
 
 // Auth Routes
+api.get('/facebook', authCtrl.facebook);
 api.post('/signup', authCtrl.signup);
 api.post('/login', authCtrl.login);
 api.post('/reset', authCtrl.reset);
