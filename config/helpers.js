@@ -1,4 +1,4 @@
-var M = require('../models'),
+var M = require(__base+'/models'),
 	config = require('./config'),
 	bcrypt = require('co-bcryptjs'),
 	randomstring = require('randomstring'),
@@ -7,31 +7,41 @@ var M = require('../models'),
 
 module.exports = {
 
-	// Check if user exists
-	userExists: function* (email) {
+	
+	userExists: function* (email) { // Check if user exists
 
 		var existingUser = yield M.User.filter({email: email }).run();
 
 		// Check if response is an empty array and return id or false
-		if(existingUser.length > 0) return existingUser[0].id;
+		if(existingUser.length > 0) return existingUser[0];
 		else return false;
 	},
 
-	// Create new user
-	userCreate: function* (data) {
+	
+	userCreate: function* (data, provider) { // Create new user
 
-		// Set password if it's not set already
-		if(data.password) var realPassword = data.password;
-		else var realPassword = randomstring.generate(7);
+		var user, doc, realPassword, password;
 
-		var password = yield this.hashPassword(realPassword);
+		if(provider) {
+			
+			user = new M.User({email: data.email, first_name: data.name, provider_id: data.id, provider: provider });
+			doc = yield user.save();
 
-		// Update record
-		var user = new M.User({email: data.email, password: password, first_name: data.first_name });
-		var doc = yield user.save();
+		} else {
 
-		// Send an email to user with their password
+			// Set password if it's not set already
+			if(data.password) realPassword = data.password;
+			else realPassword = randomstring.generate(7);
 
+			password = yield this.hashPassword(realPassword);
+
+			// Update record
+			user = new M.User({email: data.email, password: password, first_name: data.first_name });
+			doc = yield user.save();
+
+			// Send an email to user with their password
+
+		}
 
 		return doc;
 

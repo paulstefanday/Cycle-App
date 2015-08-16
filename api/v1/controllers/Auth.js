@@ -1,9 +1,9 @@
 var   formidable = require('koa-formidable'),
       jwt = require('jsonwebtoken'),
       bcrypt = require('co-bcryptjs'),
-      config = require('../../../config/config'),
-      M = require('../../../models'),
-      H = require('../../../config/helpers'),
+      config = require(__base+'/config/config'),
+      M = require(__base+'/models'),
+      H = require(__base+'/config/helpers'),
       Purest = require('purest'),
       randomstring = require('randomstring'),
       secret = config.secret,
@@ -16,14 +16,27 @@ module.exports.facebook = function *(next) {
   // && https://grant-oauth.herokuapp.com/#/facebook
   
   var facebook = new Purest({ provider: 'facebook', promise: true }), 
-      profile;
+      profile, exists;
 
   profile = yield facebook.query()
     .get('me?fields=id,name,email,birthday')
     .auth(this.query.access_token)
     .request();
 
-  this.body = profile[1];
+  // check if user exists
+  exists = yield H.userExists(profile[1].email);
+
+  // create user
+  if(!exists) exists = yield H.userCreate(profile[1], 'facebook');
+
+  // // set session
+  // this.session.grant.user = profile[1];
+
+  // redirect to map
+  this.body = { token: jwt.sign({ id: exists.id, email: exists.email, name: exists.first_name }, secret)  };
+  this.status = 200;
+
+  // this.body = profile[1];
 
 }
 

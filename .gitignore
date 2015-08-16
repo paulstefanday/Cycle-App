@@ -1,5 +1,7 @@
 rethinkdb_data/
 
+client/node_modules/
+
 *.pem
 
 # Logs
