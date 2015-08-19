@@ -1,7 +1,7 @@
 'use strict';
-var config = require('../../../config/config'),
-  	M = require('../../../models/'),
-    thinky = require(__base+'/config/thinky.js'),
+var config = require(__base+'/api/config/config'),
+  	M = require(__base+'/api/models/'),
+    thinky = require(__base+'/api/config/thinky.js'),
     r = thinky.r;
 
 

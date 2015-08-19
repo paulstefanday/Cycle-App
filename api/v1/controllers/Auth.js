@@ -1,13 +1,13 @@
 var   formidable = require('koa-formidable'),
       jwt = require('jsonwebtoken'),
       bcrypt = require('co-bcryptjs'),
-      config = require(__base+'/config/config'),
-      M = require(__base+'/models'),
-      H = require(__base+'/config/helpers'),
+      config = require(__base+'/api/config/config'),
+      M = require(__base+'/api/models'),
+      H = require(__base+'/api/config/helpers'),
       Purest = require('purest'),
       randomstring = require('randomstring'),
       secret = config.secret,
-      thinky = require(__base+'/config/thinky.js'),
+      thinky = require(__base+'/api/config/thinky.js'),
       r = thinky.r;
 
 module.exports.facebook = function *(next) {

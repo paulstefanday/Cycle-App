@@ -1,12 +1,12 @@
 var Roles = require('koa-roles'),
-	config = require(__base+'/config/config.js'),
-	thinky = require(__base+'/config/thinky.js'),
+	config = require(__base+'/api/config/config.js'),
+	thinky = require(__base+'/api/config/thinky.js'),
 	type = thinky.type,
 	r = thinky.r,
 	formidable = require('koa-formidable'),
 	validator = require('validator'),
 	_ = require('lodash'),
-	M = require('../models');
+	M = require(__base+'/api/models');
 
 
 // Error handling

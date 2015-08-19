@@ -15,23 +15,13 @@ gulp.task('build', function() {
     .pipe(gulp.dest('./public'))
 });
 
-gulp.task('db', function (cb) {
-  exec('rethinkdb', execError);
-});
-
 gulp.task('server', function (cb) {
-	exec('node_modules/.bin/nodemon --harmony --watch server.js', execError);
+	exec('node_modules/.bin/nodemon --harmony --watch server.js', function execError(err, stdout, stderr) { console.log(stdout); console.log(stderr); cb(err); });
 });
 
-gulp.task('default', ['db', 'server', 'build', 'watch']);
+gulp.task('default', ['server', 'build', 'watch']);
 
 gulp.task('watch', function () {
-   gulp.watch('./client/**/*.*', ['build']);
+  gulp.watch('./client/**/*.*', ['build']);
 });
 
-
-function execError(err, stdout, stderr) {
-  console.log(stdout);
-  console.log(stderr);
-  cb(err);
-}

@@ -1,5 +1,5 @@
 var jwt = require('jsonwebtoken'),
-    config = require('./config'),
+    config = require(__base+'/api/config/config'),
     // jade = require('koa-jade'),
     secret = config.secret;
 

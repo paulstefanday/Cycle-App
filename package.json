@@ -5,12 +5,12 @@
   "main": "server.js",
   "scripts": {
     "test": "node --harmony `which gulp` test-once",
-    "start": "node_modules/.bin/nodemon --harmony --watch server.js",
+    "start": "node_modules/.bin/gulp",
     "docs": "./node_modules/apidoc/bin/apidoc -i api/ -o docs/",
     "up": "node --harmony up.js",
     "down": "node --harmony down.js"
   },
-  "author": "Agency.sc",
+  "author": "Paul Day",
   "license": "MIT",
   "dependencies": {
     "bluebird": "^2.9.26",
