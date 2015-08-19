@@ -28,8 +28,7 @@ app.use(middleware.errors);
 app.use(middleware.permissions);
 app.use(middleware.auth);
 
-app.use(route.get('/', function *() { this.body = yield render('client/views/join.jade'); }));
-app.use(route.get('/map', function *() { this.body = yield render('client/views/map.jade'); }));
+app.use(route.get('/*', function *() { this.body = yield render('client/index.jade'); }));
 
 // HTTP routes
 app.use(mount('/api/v1', require('./api/v1/routes')));
