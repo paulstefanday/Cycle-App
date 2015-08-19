@@ -13,13 +13,16 @@ var app = module.exports = require('koa')(),
    	session = require('koa-session'),
     Grant = require('grant-koa'),
     grant = new Grant(config.oauth),
+    serve = require('koa-static-folder'),
    	bodyParser = require('koa-bodyparser');
 
 var server, io;
 
 // Middleware
 // app.use(middleware.logs);
+
 app.keys = ['grant'];
+app.use(serve('./public'))
 app.use(bodyParser());
 app.use(session(app));
 app.use(mount(grant));
