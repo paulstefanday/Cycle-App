@@ -20,7 +20,6 @@ var server, io;
 
 // Middleware
 // app.use(middleware.logs);
-
 app.keys = ['grant'];
 app.use(serve('./public'))
 app.use(bodyParser());
@@ -31,7 +30,7 @@ app.use(middleware.errors);
 app.use(middleware.permissions);
 app.use(middleware.auth);
 
-app.use(route.get('/*', function *() { this.body = yield render('client/index.jade'); }));
+app.use(route.get('/*', function *() { this.body = yield render('./client/index.jade'); }));
 
 // HTTP routes
 app.use(mount('/api/v1', require('./api/v1/routes')));

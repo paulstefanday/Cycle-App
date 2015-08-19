@@ -1,24 +1,30 @@
-require('socket.io');
-var angular = require('angular'),
-    name = 'app';
+const io = require('socket.io-client'),
+      angular = require('angular'),
+      name = 'app';
 
 require('angular-socket-io');
 require('angular-ui-router');
 
+
+// App
 angular.module(name, [
   'btford.socket-io', 
   'ui.router'
-]);
+]).config(require('./config'));
 
-require('./boostrap')(name)
+
+// App Parts
+require('./bootstrap')(name)
+  .directive(...require('./directives/map'))
+
   .factory('socket', /*@ngInject*/ function (socketFactory) {
     return socketFactory({
       prefix: '',
       ioSocket: io.connect('http://localhost:3000')
     });
   })
-  .directive(...require('./directives/map'))
-  .config(require('./config'));
+  
+
 
 
 
