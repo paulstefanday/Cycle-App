@@ -19,12 +19,12 @@ var app = module.exports = require('koa')(),
 var server, io;
 
 // Middleware
-// app.use(middleware.logs);
-app.keys = ['grant'];
+app.use(middleware.logs);
+// app.keys = ['grant'];
 app.use(serve('./public'))
 app.use(bodyParser());
-app.use(session(app));
-app.use(mount(grant));
+// app.use(session(app));
+// app.use(mount(grant));
 app.use(middleware.cors);
 app.use(middleware.errors);
 app.use(middleware.permissions);
@@ -38,11 +38,9 @@ app.use(mount('/api/v1', require('./api/v1/routes')));
 // Setup socket server
 server = http.Server(app.callback());
 io = socketIo(server);
-
-// IO routes
 require('./api/v1/controllers/io').activity(io);
 
-// Listern to port
+// Listen
 app.listen(config.port, function() {
   console.log('App is running at http://localhost:' + config.port + '/'); // Tell us that we're up and running
 });

@@ -8,35 +8,28 @@ var   formidable = require('koa-formidable'),
       randomstring = require('randomstring'),
       secret = config.secret,
       thinky = require(__base+'/api/config/thinky.js'),
+      request = require('koa-request'),
       r = thinky.r;
 
 module.exports.facebook = function *(next) {
 
-  // Figure out details with https://developers.facebook.com/tools/explorer/ 
-  // && https://grant-oauth.herokuapp.com/#/facebook
-  
-  var facebook = new Purest({ provider: 'facebook', promise: true }), 
-      profile, exists;
+  var accessTokenUrl = 'https://graph.facebook.com/v2.4/oauth/access_token';
+  var graphApiUrl = 'https://graph.facebook.com/v2.4/me?fields=id,name,email,birthday';
+  var params = {
+    code: this.request.body.code,
+    client_id: this.request.body.clientId,
+    client_secret: config.facebook.secret,
+    redirect_uri: this.request.body.redirectUri
+  };
 
-  profile = yield facebook.query()
-    .get('me?fields=id,name,email,birthday')
-    .auth(this.query.access_token)
-    .request();
+  var token = yield request.get({ url: accessTokenUrl, qs: params, json: true }); // get token
+  var user = yield request.get({ url: graphApiUrl, qs: token.body, json: true }); // get user data
 
-  // check if user exists
-  exists = yield H.userExists(profile[1].email);
+  exists = yield H.userExists(user.body.email); // check if user exists
+  if(!exists) exists = yield H.userCreate(user.body, 'facebook'); // create user
 
-  // create user
-  if(!exists) exists = yield H.userCreate(profile[1], 'facebook');
-
-  // // set session
-  // this.session.grant.user = profile[1];
-
-  // redirect to map
   this.body = { token: jwt.sign({ id: exists.id, email: exists.email, name: exists.first_name }, secret)  };
   this.status = 200;
-
-  // this.body = profile[1];
 
 }
 

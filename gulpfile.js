@@ -19,7 +19,7 @@ gulp.task('server', function (cb) {
 	exec('node_modules/.bin/nodemon --harmony --watch server.js', function execError(err, stdout, stderr) { console.log(stdout); console.log(stderr); cb(err); });
 });
 
-gulp.task('default', ['server', 'build', 'watch']);
+gulp.task('default', ['build', 'watch']);
 
 gulp.task('watch', function () {
   gulp.watch('./client/**/*.*', ['build']);

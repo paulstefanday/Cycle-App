@@ -4,26 +4,21 @@ const io = require('socket.io-client'),
 
 require('angular-socket-io');
 require('angular-ui-router');
-
+require('satellizer');
 
 // App
 angular.module(name, [
-  'btford.socket-io', 
-  'ui.router'
+	'satellizer',
+	'btford.socket-io', 
+	'ui.router'
 ]).config(require('./config'));
 
 
 // App Parts
 require('./bootstrap')(name)
-  .directive(...require('./directives/map'))
+	.directive(...require('./directives/map'))
+	// .factory('socket', /*@ngInject*/ (socketFactory) => socketFactory({ prefix: '', ioSocket: io.connect('http://localhost:3000')}))
 
-  .factory('socket', /*@ngInject*/ function (socketFactory) {
-    return socketFactory({
-      prefix: '',
-      ioSocket: io.connect('http://localhost:3000')
-    });
-  })
-  
 
 
 

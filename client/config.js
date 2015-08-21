@@ -1,6 +1,29 @@
-export default /*@ngInject*/ function($stateProvider, $urlRouterProvider) {
+export default /*@ngInject*/ function($stateProvider, $urlRouterProvider, $authProvider) {
 
   $urlRouterProvider.otherwise("/");
+
+  $authProvider.loginRedirect = '/report';
+  $authProvider.logoutRedirect = '/';
+  $authProvider.signupRedirect = '/report';
+  $authProvider.loginUrl = '/api/v1/login';
+  $authProvider.signupUrl = '/api/v1/signup';
+  $authProvider.loginRoute = '/';
+  $authProvider.signupRoute = '/';
+  $authProvider.tokenPrefix = 'cycleApp';
+
+  // Facebook
+  $authProvider.facebook({
+    clientId: '535124743311296',
+    url: '/api/v1/facebook',
+    authorizationEndpoint: 'https://www.facebook.com/v2.4/dialog/oauth',
+    redirectUri: (window.location.origin || window.location.protocol + '//' + window.location.host) + '/',
+    scope: ["public_profile", "email", "user_birthday"],
+    scopeDelimiter: ',',
+    requiredUrlParams: ['display', 'scope'],
+    display: 'popup',
+    type: '2.4',
+    popupOptions: { width: 580, height: 400 }
+  });
 
   $stateProvider
     .state('home', {
@@ -11,13 +34,13 @@ export default /*@ngInject*/ function($stateProvider, $urlRouterProvider) {
     .state('map', {
       url: "/map",
       controller: require('./views/map.js'),
-      templateUrl: require('./views/map.jade')
+      template: require('./views/map.jade')
     })
-    // .state('report', {
-    //   url: "/report",
-    //   controller: require('./views/report.js'),
-    //   templateUrl: require('./views/report.jade')
-    // })
+    .state('report', {
+      url: "/report",
+      controller: require('./views/report.js'),
+      template: require('./views/report.jade')
+    })
 }
 
 

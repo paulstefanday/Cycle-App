@@ -22,17 +22,8 @@ module.exports = {
 	// Root admin
 	"admin": process.env.ADMIN || 'paul@paulday.com.au',
 
-	// Grant oAuth config
-	"oauth": {
-	  "server": {
-	    "protocol": "http",
-	    "host":  process.env.NODE_ENV ? "hitthebrakes.org" : "localhost:3000"
-	  },
-	  "facebook": {
-	    "key": process.env.NODE_ENV ? "535096706647433" : "535124743311296",
+	"facebook":  {
+		"key": process.env.NODE_ENV ? "535096706647433" : "535124743311296",
 	    "secret": process.env.NODE_ENV ? "3b1c59ff4236ec10851ac6791432b541" : "ebe1bd018199eb66dadfc19377f6bb30",
-	    "callback": "/api/v1/facebook",
-	    "scope": [ "public_profile", "email", "user_birthday" ]
-	  }
 	}
 };

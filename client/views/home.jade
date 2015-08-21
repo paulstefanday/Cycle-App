@@ -1,12 +1,10 @@
 h1 Welcome to Hit the breaks!
 
 //- If not logged in
-form(action="/connect/facebook" method="post" accept-charset="utf-8")
-    button Login via Facebook to start reporting incidents
+//- form(action="/connect/facebook" method="post" accept-charset="utf-8")
+button(ng-click="authenticate('facebook')") Login via Facebook to start reporting incidents
 
 //- If logged in
 button Report
 
-a(href="/map") View Map
-
-      
+button(ui-sref="map") View Map
