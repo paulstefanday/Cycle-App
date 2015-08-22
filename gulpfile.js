@@ -3,11 +3,13 @@ var browserify = require('gulp-browserify');
 var rename = require('gulp-rename');
 var ngAnnotate = require('gulp-ng-annotate');
 var exec = require('child_process').exec;
- 
+var envify = require('envify/custom');
+
 gulp.task('build', function() {
   gulp.src('./client/index.js', { read: false })
     .pipe(browserify({
-      transform: ['babelify', 'jadeify', 'lessify'],
+      insertGlobals: true,
+      transform: ['babelify', 'jadeify', 'lessify', ['envify', { ENV: process.env.ENV }] ],
       extensions: ['.less', '.jade']
     }))
     .pipe(ngAnnotate())

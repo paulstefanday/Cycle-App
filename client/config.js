@@ -1,3 +1,4 @@
+
 export default /*@ngInject*/ function($stateProvider, $urlRouterProvider, $authProvider) {
 
   $urlRouterProvider.otherwise("/");
@@ -11,9 +12,12 @@ export default /*@ngInject*/ function($stateProvider, $urlRouterProvider, $authP
   $authProvider.signupRoute = '/';
   $authProvider.tokenPrefix = 'cycleApp';
 
+  var id = process.env.ENV === 'production' ? "535096706647433" : "535124743311296";
+  console.log(process.env.ENV, id);
+
   // Facebook
   $authProvider.facebook({
-    clientId: '535124743311296',
+    clientId: id,
     url: '/api/v1/facebook',
     authorizationEndpoint: 'https://www.facebook.com/v2.4/dialog/oauth',
     redirectUri: (window.location.origin || window.location.protocol + '//' + window.location.host) + '/',
@@ -48,5 +52,4 @@ export default /*@ngInject*/ function($stateProvider, $urlRouterProvider, $authP
       template: require('./views/report.jade')
     })
 }
-
 

@@ -6,6 +6,7 @@
   "scripts": {
     "test": "node --harmony `which gulp` test-once",
     "start": "node_modules/.bin/gulp",
+    "build": "ENV=production node_modules/.bin/gulp",
     "server": "node_modules/.bin/nodemon --harmony --watch server.js",
     "docs": "./node_modules/apidoc/bin/apidoc -i api/ -o docs/",
     "up": "node --harmony up.js",
@@ -74,6 +75,7 @@
     "chai": "^2.3.0",
     "co-supertest": "0.0.10",
     "deamdify": "^0.1.1",
+    "envify": "^3.4.0",
     "faker": "^2.1.4",
     "gulp": "^3.8.11",
     "gulp-browserify": "^0.5.1",

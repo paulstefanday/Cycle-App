@@ -4,4 +4,6 @@ export default /*@ngInject*/ function ($scope, $auth) {
       $auth.authenticate(provider);
     };
 
+    this.isUser = $auth.isAuthenticated();
+
 }
