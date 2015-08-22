@@ -38,6 +38,12 @@ export default /*@ngInject*/ function($stateProvider, $urlRouterProvider, $authP
     })
     .state('report', {
       url: "/report",
+      resolve: { auth: ($auth, $q, $state) => {
+        let q = $q.defer();
+        if($auth.isAuthenticated()) q.resolve();
+        else $state.go('home');
+        return q.promise;
+      }},
       controller: require('./views/report.js'),
       template: require('./views/report.jade')
     })

@@ -195,6 +195,11 @@ exports['default'] = /*@ngInject*/["$stateProvider", "$urlRouterProvider", "$aut
     template: require('./views/map.jade')
   }).state('report', {
     url: "/report",
+    resolve: { auth: ["$auth", "$q", "$state", function auth($auth, $q, $state) {
+        var q = $q.defer();
+        if ($auth.isAuthenticated()) q.resolve();else $state.go('home');
+        return q.promise;
+      }] },
     controller: require('./views/report.js'),
     template: require('./views/report.jade')
   });
@@ -302,7 +307,7 @@ var buf = [];
 var jade_mixins = {};
 var jade_interp;
 
-buf.push("<h1>Welcome to Hit the breaks!</h1><button ng-click=\"authenticate('facebook')\">Login via Facebook to start reporting incidents</button><button>Report</button><button ui-sref=\"map\">View Map</button>");;return buf.join("");
+buf.push("<h1>Welcome to Hit the breaks!</h1><button ng-click=\"authenticate('facebook')\">Login via Facebook to start reporting incidents</button><button ui-sref=\"report\">Report</button><button ui-sref=\"map\">View Map</button>");;return buf.join("");
 };
 },{"jade/runtime":16}],6:[function(require,module,exports){
 "use strict";
