@@ -2,7 +2,7 @@ export default /*@ngInject*/ function ($scope, socket) {
 
 	$scope.activities = [];
 
-	socket.emit('activity:changes:start', { filter: { type: 'Petition' } });
+	socket.emit('activity:changes:start', {});
 
 	socket.on('activity:changes', function (change) {
 		if(change.new_val === null) console.log(change.old_val.id); // remove using change.old_val.id

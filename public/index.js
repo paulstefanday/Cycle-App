@@ -177,13 +177,8 @@ exports['default'] = /*@ngInject*/["$stateProvider", "$urlRouterProvider", "$aut
     clientId: process.env.ENV === 'production' ? "535096706647433" : "535124743311296",
     url: '/api/v1/facebook',
     authorizationEndpoint: 'https://www.facebook.com/v2.4/dialog/oauth',
-    redirectUri: (window.location.origin || window.location.protocol + '//' + window.location.host) + '/',
     scope: ["public_profile", "email", "user_birthday"],
-    scopeDelimiter: ',',
-    requiredUrlParams: ['display', 'scope'],
-    display: 'popup',
-    type: '2.4',
-    popupOptions: { width: 580, height: 400 }
+    type: '2.4'
   });
 
   $stateProvider.state('home', {
@@ -216,68 +211,75 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
-exports['default'] = ['map', function () {
+var map;
 
-  var map;
+var CustomMap = (function () {
+  function CustomMap() {
+    _classCallCheck(this, CustomMap);
 
-  this.restrict = 'E';
-  this.controllerAs = 'vm';
-  this.bindToController = true;
-  this.template = '<div ng-style="vm.style"></div>';
-  this.scope = { height: '@', width: '@', feed: '=', markers: '=', position: '@' };
+    this.restrict = 'E';
+    this.controllerAs = 'vm';
+    this.bindToController = true;
+    this.template = '<div ng-style="vm.style"></div>';
+    this.scope = { height: '@', width: '@', feed: '=', markers: '=', position: '@' };
+    this.controller = /*@ngInject*/["$scope", function ($scope) {
+      var _this = this;
 
-  this.controller = /*@ngInject*/["$scope", function ($scope) {
-    var _this = this;
+      this.items = [];
+      this.markers = [];
+      this.style = { width: this.height, height: this.width, position: this.position, float: 'left', top: 0, left: 0 };
 
-    this.items = [];
-    this.markers = [];
+      $scope.$watchCollection('vm.feed', _lodash2['default'].debounce(function (res) {
+        _this.update(res);
+      }, 500));
 
-    $scope.$watchCollection('vm.feed', _lodash2['default'].debounce(function (res) {
-      _this.update(res);
-    }, 500));
+      this.update = function (res) {
 
-    this.style = {
-      width: this.height,
-      height: this.width,
-      position: this.position,
-      float: 'left',
-      top: 0,
-      left: 0
-    };
+        var diff = _lodash2['default'].difference(res, _this.items);
 
-    this.update = function (res) {
-
-      var diff = _lodash2['default'].difference(res, _this.items);
-
-      diff.forEach(function (item) {
-        _this.items.push(item);
-        var marker = new google.maps.Marker({
-          position: new google.maps.LatLng(item.lat, item.lng),
-          map: map,
-          animation: google.maps.Animation.DROP
+        diff.forEach(function (item) {
+          _this.items.push(item);
+          var marker = new google.maps.Marker({
+            position: new google.maps.LatLng(item.lat, item.lng),
+            map: map,
+            animation: google.maps.Animation.DROP
+          });
+          _this.markers.push(marker);
         });
-        _this.markers.push(marker);
-      });
-    };
-  }];
-
-  this.link = function ($scope, $element, $attr) {
-    // Setup Map
-    var el = $element[0].children[0];
-    if (document.readyState === "complete") initialize(el);else google.maps.event.addDomListener(window, 'load', initialize(el));
-  };
-
-  function initialize(el) {
-    var mapOptions = { center: new google.maps.LatLng(0, 0), zoom: 1, mapTypeId: google.maps.MapTypeId.ROADMAP };
-    map = new google.maps.Map(el, mapOptions);
+      };
+    }];
   }
-}];
+
+  _createClass(CustomMap, [{
+    key: 'link',
+    value: function link($scope, $element, $attr) {
+      console.log('link fn called');
+      var el = $element[0].children[0];
+      if (document.readyState === "complete") this.initialize(el);else google.maps.event.addDomListener(window, 'load', this.initialize(el));
+    }
+  }, {
+    key: 'initialize',
+    value: function initialize(el) {
+      console.log('loaded');
+      var mapOptions = { center: new google.maps.LatLng(0, 0), zoom: 1, mapTypeId: google.maps.MapTypeId.ROADMAP };
+      map = new google.maps.Map(el, mapOptions);
+    }
+  }]);
+
+  return CustomMap;
+})();
+
+exports['default'] = ['map', CustomMap];
 module.exports = exports['default'];
 
 },{"lodash":18}],4:[function(require,module,exports){
@@ -352,7 +354,7 @@ exports['default'] = /*@ngInject*/["$scope", "socket", function ($scope, socket)
 
 	$scope.activities = [];
 
-	socket.emit('activity:changes:start', { filter: { type: 'Petition' } });
+	socket.emit('activity:changes:start', {});
 
 	socket.on('activity:changes', function (change) {
 		if (change.new_val === null) console.log(change.old_val.id); // remove using change.old_val.id
@@ -381,23 +383,46 @@ var buf = [];
 var jade_mixins = {};
 var jade_interp;
 
-buf.push("<h1>Report</h1><button ng-click=\"report()\">Report current location</button><p>or</p><form name=\"reportForm\"><input type=\"text\" ng-model=\"new.address\" placeholder=\"Address\" required=\"required\"/><button ng-click=\"report()\" ng-disabled=\"reportForm.$invalid\">Report using address</button></form>");;return buf.join("");
+buf.push("<h1>Report</h1><button ng-click=\"report()\">Report current location</button><p>or</p><form name=\"reportForm\"><input type=\"text\" ng-model=\"new.address\" placeholder=\"Address\" required=\"required\"/><select ng-model=\"new.type\"><option value=\"crash\">Crash</option><option value=\"abuse\">Abuse</option><option value=\"almost\">Almost crash</option></select><button ng-click=\"report()\" ng-disabled=\"reportForm.$invalid\">Report using address</button></form>");;return buf.join("");
 };
 },{"jade/runtime":17}],10:[function(require,module,exports){
-"use strict";
+'use strict';
 
-Object.defineProperty(exports, "__esModule", {
-	value: true
+Object.defineProperty(exports, '__esModule', {
+  value: true
 });
 
-exports["default"] = /*@ngInject*/["$scope", "$auth", function ($scope, $auth) {
+exports['default'] = /*@ngInject*/["$scope", "$q", "$http", function ($scope, $q, $http) {
+  var _this = this;
 
-	$scope.logout = function () {
-		$auth.logout();
-	};
+  $scope.report = function () {
+
+    $scope.getGeo().then(function (res) {
+      return $http.post('/api/v1/activity', pos);
+    }).then(function (res) {
+      return alert('submitted');
+    });
+  };
+
+  $scope.getGeo = function () {
+
+    var q = $q.defer();
+
+    navigator.geolocation.getCurrentPosition(function (pos) {
+      _this.pos = pos.coords;
+      _this.loaded();
+      q.resolve(_this.pos);
+    }, function (error) {
+      _this.loaded();
+      alert('Unable to get location: ' + error.message);
+      q.reject(error);
+    });
+
+    return q.promise;
+  };
 }];
 
-module.exports = exports["default"];
+module.exports = exports['default'];
 
 },{}],11:[function(require,module,exports){
 /*

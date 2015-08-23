@@ -22,9 +22,10 @@ var   config = require(__base+'/api/config/config'),
 
  	var body = this.request.body, record, result;
 
- 	console.log(body);
-
  	body.fields.ip = this.req.headers['x-forwarded-for'] || this.req.connection.remoteAddress;
+ 	body.fields.userId = this.user.id;
+
+ 	console.log(body);
 
  	record = new M.Activity(body.fields);
  	result = yield record.save();

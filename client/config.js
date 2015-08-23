@@ -17,13 +17,8 @@ export default /*@ngInject*/ function($stateProvider, $urlRouterProvider, $authP
     clientId: process.env.ENV === 'production' ? "535096706647433" : "535124743311296",
     url: '/api/v1/facebook',
     authorizationEndpoint: 'https://www.facebook.com/v2.4/dialog/oauth',
-    redirectUri: (window.location.origin || window.location.protocol + '//' + window.location.host) + '/',
     scope: ["public_profile", "email", "user_birthday"],
-    scopeDelimiter: ',',
-    requiredUrlParams: ['display', 'scope'],
-    display: 'popup',
     type: '2.4',
-    popupOptions: { width: 580, height: 400 }
   });
 
   $stateProvider

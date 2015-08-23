@@ -6,13 +6,10 @@ var config 		= require(__base+'/api/config/config.js'),
 
 var activities = thinky.createModel("activities", {
     id: type.string(),
-    client: type.string(),
-    campaign: type.string(),
-    action: type.string(),
-    value: type.string(),
+    userId: type.string(),
     ip: type.string(),
-    lat: type.number(),
-    lng: type.number(),
+    location: type.object(),
+    type: type.string(),
     createdAt: type.date().default(r.now())
 });
 
