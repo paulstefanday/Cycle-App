@@ -1,6 +1,6 @@
 var Roles = require('koa-roles'),
-	config = require(__base+'/api/config/config.js'),
-	thinky = require(__base+'/api/config/thinky.js'),
+	config = require(__base+'/api/config/config'),
+	thinky = require(__base+'/api/config/thinky'),
 	type = thinky.type,
 	r = thinky.r,
 	formidable = require('koa-formidable'),
@@ -21,14 +21,6 @@ var user = new Roles({
 
 
 // Roles
-
-// Admin users can access all pages
-user.use(function (action) {
-  // if (this.user.role === 'admin') {
-  //   return true;
-  // }
-});
-
 user.use('logged in', function (action) {
 	if (this.user) return true;
 })

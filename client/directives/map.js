@@ -8,7 +8,7 @@ export default [ 'map', function(){
   this.controllerAs = 'vm';
   this.bindToController = true;
   this.template = `<div ng-style="vm.style"></div>`;
-  this.scope = { height:'=', width:'=', feed:'=', markers: '=' };
+  this.scope = { height:'@', width:'@', feed:'=', markers: '=', position: '@' };
   
   this.controller = /*@ngInject*/ function($scope){
 
@@ -20,9 +20,12 @@ export default [ 'map', function(){
     }, 500));
 
     this.style = { 
-      width:this.height.toString()+'px', 
-      height:this.width.toString()+'px', 
-      float:'left' 
+      width:this.height, 
+      height:this.width, 
+      position:this.position,
+      float:'left',
+      top: 0,
+      left: 0
     };
 
     this.update = (res) => {

@@ -74,6 +74,7 @@
     "browserify-shim": "^3.8.10",
     "chai": "^2.3.0",
     "co-supertest": "0.0.10",
+    "cssify": "^0.7.0",
     "deamdify": "^0.1.1",
     "envify": "^3.4.0",
     "faker": "^2.1.4",

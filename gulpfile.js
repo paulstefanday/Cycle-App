@@ -8,9 +8,8 @@ var envify = require('envify/custom');
 gulp.task('build', function() {
   gulp.src('./client/index.js', { read: false })
     .pipe(browserify({
-      insertGlobals: true,
-      transform: ['babelify', 'jadeify', 'lessify', ['envify', { ENV: process.env.ENV }] ],
-      extensions: ['.less', '.jade']
+      transform: ['cssify', 'babelify', 'jadeify', 'lessify', ['envify', { ENV: process.env.ENV }]],
+      extensions: ['.less', '.jade', '.css']
     }))
     .pipe(ngAnnotate())
     .pipe(rename('index.js'))

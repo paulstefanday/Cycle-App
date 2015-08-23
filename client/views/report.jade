@@ -1,2 +1,11 @@
 h1 Report
-button(ng-click="logout()") logout
+
+button(ng-click="report()") Report current location
+
+p or
+
+form(name="reportForm")
+	input(type="text" ng-model="new.address" placeholder="Address" required)
+	button(ng-click="report()" ng-disabled="reportForm.$invalid") Report using address
+
+//- button(ng-click="logout()") logout
