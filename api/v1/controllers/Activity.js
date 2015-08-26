@@ -16,18 +16,18 @@ var   config = require(__base+'/api/config/config'),
  *     HTTP/1.1 200 OK
  *     { id: 'asdadasdsdadasdad' }
  *
- */ 
+ */
 
  module.exports.create = function *() {
 
  	var body = this.request.body, record, result;
 
- 	body.fields.ip = this.req.headers['x-forwarded-for'] || this.req.connection.remoteAddress;
- 	body.fields.userId = this.user.id;
+ 	body.ip = this.req.headers['x-forwarded-for'] || this.req.connection.remoteAddress;
+ 	body.userId = this.user.id;
 
  	console.log(body);
 
- 	record = new M.Activity(body.fields);
+ 	record = new M.Activity(body);
  	result = yield record.save();
 
  	this.body = result;

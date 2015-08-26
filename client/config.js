@@ -11,6 +11,8 @@ export default /*@ngInject*/ function($stateProvider, $urlRouterProvider, $authP
   $authProvider.loginRoute = '/';
   $authProvider.signupRoute = '/';
   $authProvider.tokenPrefix = 'cycleApp';
+  $authProvider.authHeader = 'Authorization';
+  $authProvider.authToken = '';
 
   // Facebook
   $authProvider.facebook({
@@ -21,25 +23,31 @@ export default /*@ngInject*/ function($stateProvider, $urlRouterProvider, $authP
     type: '2.4',
   });
 
+
   $stateProvider
     .state('home', {
       url: "/",
+      controllerAs: 'vm',
       controller: require('./views/home.js'),
       template: require('./views/home.jade')
     })
     .state('map', {
       url: "/map",
+      controllerAs: 'vm',
       controller: require('./views/map.js'),
       template: require('./views/map.jade')
     })
     .state('report', {
       url: "/report",
-      resolve: { auth: ($auth, $q, $state) => {
-        let q = $q.defer();
-        if($auth.isAuthenticated()) q.resolve();
-        else $state.go('home');
-        return q.promise;
-      }},
+      resolve: {
+        auth: /*@ngInject*/ ($auth, $q, $state) => {
+          let q = $q.defer();
+          if($auth.isAuthenticated()) q.resolve();
+          else $state.go('home');
+          return q.promise;
+        }
+      },
+      controllerAs: 'vm',
       controller: require('./views/report.js'),
       template: require('./views/report.jade')
     })

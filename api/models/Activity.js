@@ -8,11 +8,14 @@ var activities = thinky.createModel("activities", {
     id: type.string(),
     userId: type.string(),
     ip: type.string(),
-    location: type.object(),
+    location: type.point(),
     type: type.string(),
-    createdAt: type.date().default(r.now())
+    createdAt: type.date().default(r.now()),
+    // time
+    // geo json
 });
 
 activities.ensureIndex("createdAt");
+activities.ensureIndex("location");
 
 module.exports = activities;

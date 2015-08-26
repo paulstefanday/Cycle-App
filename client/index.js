@@ -9,9 +9,13 @@ require('satellizer');
 // App
 angular.module(name, [
 	'satellizer',
-	'btford.socket-io', 
+	'btford.socket-io',
 	'ui.router'
-]).config(require('./config'));
+])
+  .config(require('./config'))
+  .run(function($rootScope, $auth) {
+
+  })
 
 
 // App Parts

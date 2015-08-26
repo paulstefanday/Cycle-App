@@ -1,9 +1,9 @@
-export default /*@ngInject*/ function ($scope, $auth) {
+export default /*@ngInject*/ function($auth) {
 
-	$scope.authenticate = function(provider) {
-      $auth.authenticate(provider);
-    };
+	this.authenticate = function(provider) {
+    $auth.authenticate(provider);
+  };
 
-    this.isUser = $auth.isAuthenticated();
+  this.isUser = $auth.isAuthenticated();
 
 }

@@ -8,23 +8,18 @@ var app = module.exports = require('koa')(),
     socketIo  = require('socket.io'),
     M = require(__base+'/api/models'),
    	route = require('koa-route'),
-    router = require('koa-router'),
    	render = require('co-render'),
    	session = require('koa-session'),
     Grant = require('grant-koa'),
-    grant = new Grant(config.oauth),
     serve = require('koa-static-folder'),
    	bodyParser = require('koa-bodyparser');
 
 var server, io;
 
 // Middleware
-app.use(middleware.logs);
-// app.keys = ['grant'];
-app.use(serve('./public'))
 app.use(bodyParser());
-// app.use(session(app));
-// app.use(mount(grant));
+app.use(middleware.logs);
+app.use(serve('./public'))
 app.use(middleware.cors);
 app.use(middleware.errors);
 app.use(middleware.permissions);

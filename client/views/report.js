@@ -1,28 +1,21 @@
-export default /*@ngInject*/ function ($scope, $q, $http) {
+export default /*@ngInject*/ function ($q, $http, $auth) {
 
-	$scope.report = () => {
+  this.report = () => {
 
-		$scope.getGeo()
-			.then(res => $http.post('/api/v1/activity', pos))
-			.then(res => alert('submitted'));
+    this.getGeo()
+      .then(res => { console.log({ latitude: res.latitude, longitude: res.longitude }); return $http.post('/api/v1/activity', { latitude: res.latitude, longitude: res.longitude }); })
+      .then(res => console.log(res))
+      .catch(error => console.log('Unable to get location', error))
+  }
 
-	}
+  this.user = $auth.getPayload();
 
-	$scope.getGeo = () => {
+  this.logout = () => { $auth.logout(); };
 
-		let q = $q.defer();
-
-		navigator.geolocation.getCurrentPosition(pos => {
-            this.pos = pos.coords;
-            this.loaded();
-            q.resolve(this.pos);
-        }, error => {
-            this.loaded();
-            alert('Unable to get location: ' + error.message);
-            q.reject(error);
-        });
-
-        return q.promise;
-	}
+  this.getGeo = () => {
+    let q = $q.defer();
+    navigator.geolocation.getCurrentPosition(pos => { q.resolve(pos.coords); }, error => { q.reject(error); });
+    return q.promise;
+  }
 
 }

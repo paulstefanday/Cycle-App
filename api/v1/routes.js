@@ -7,7 +7,7 @@ var router = require('koa-router');
 var api = new router();
 
 // Save activity
-api.post('/activity', activityCtrl.create);
+api.post('/activity', user.is('logged in'), activityCtrl.create);
 
 // Auth Routes
 api.post('/facebook', authCtrl.facebook);

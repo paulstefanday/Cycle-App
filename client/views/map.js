@@ -1,25 +1,25 @@
 export default /*@ngInject*/ function ($scope, socket) {
 
-	$scope.activities = [];
+	this.activities = [];
 
 	socket.emit('activity:changes:start', {});
 
-	socket.on('activity:changes', function (change) {
+	socket.on('activity:changes', change => {
 		if(change.new_val === null) console.log(change.old_val.id); // remove using change.old_val.id
-		else $scope.activities.push(change.new_val);
+		else this.activities.push(change.new_val);
 	});
 
-	$scope.start = () => {
-		socket.emit('activity:changes:start', { filter: { type: $scope.type } });
+	this.start = () => {
+		socket.emit('activity:changes:start', { filter: { type: this.type } });
 	}
 
-	$scope.stop = () => {
-		$scope.activities = []; // clear map
+	this.stop = () => {
+		this.activities = []; // clear map
 		socket.emit('activity:changes:stop'); // disconnect
 	}
 
-	$scope.change = () => {
-		
+	this.change = () => {
+
 	}
 
 }
