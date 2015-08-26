@@ -16,9 +16,7 @@ angular.module(name, [
   'oitozero.ngSweetAlert'
 ])
   .config(require('./config'))
-  .run(function($rootScope, $auth) {
-
-  })
+  .run(require('./global'))
 
 
 // App Parts

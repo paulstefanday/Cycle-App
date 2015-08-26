@@ -10,7 +10,8 @@ var dist = './public';
 
 gulp.task('css', function() {
   return gulp.src([
-      './node_modules/sweetalert/dist/sweetalert.css'
+      './node_modules/sweetalert/dist/sweetalert.css',
+      './client/index.css'
     ])
     .pipe(minifyCss({compatibility: 'ie8'}))
     .pipe(concat('index.css'))
@@ -35,6 +36,6 @@ gulp.task('server', function (cb) {
 gulp.task('default', ['build', 'css', 'watch']);
 
 gulp.task('watch', function () {
-  gulp.watch('./client/**/*.*', ['build']);
+  gulp.watch('./client/**/*.*', ['build', 'css']);
 });
 
