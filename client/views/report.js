@@ -1,11 +1,10 @@
-export default /*@ngInject*/ function ($q, $http, $auth) {
+export default /*@ngInject*/ function ($q, $http, $auth, SweetAlert) {
 
   this.report = () => {
-
     this.getGeo()
-      .then(res => { console.log({ latitude: res.latitude, longitude: res.longitude }); return $http.post('/api/v1/activity', { latitude: res.latitude, longitude: res.longitude }); })
-      .then(res => console.log(res))
-      .catch(error => console.log('Unable to get location', error))
+      .then(res => $http.post('/api/v1/activity', { latitude: res.latitude, longitude: res.longitude }))
+      .then(res => SweetAlert.swal("It worked!", "You clicked the button!", "success"))
+      .catch(error => SweetAlert.swal("It failed!", "Please try again", "error"))
   }
 
   this.user = $auth.getPayload();

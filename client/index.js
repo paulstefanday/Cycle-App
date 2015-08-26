@@ -5,12 +5,15 @@ const io = require('socket.io-client'),
 require('angular-socket-io');
 require('angular-ui-router');
 require('satellizer');
+require('sweetalert');
+require('angular-sweetalert');
 
 // App
 angular.module(name, [
 	'satellizer',
 	'btford.socket-io',
-	'ui.router'
+	'ui.router',
+  'oitozero.ngSweetAlert'
 ])
   .config(require('./config'))
   .run(function($rootScope, $auth) {
