@@ -238,7 +238,7 @@ var CustomMap = (function () {
     this.controllerAs = 'vm';
     this.bindToController = true;
     this.template = '<div ng-style="vm.style"></div>';
-    this.scope = { height: '@', width: '@', feed: '=', markers: '=', position: '@' };
+    this.scope = { height: '@', width: '@', feed: '=', markers: '=', position: '@', center: '=' };
     this.controller = /*@ngInject*/["$scope", function ($scope) {
       var _this = this;
 
@@ -249,6 +249,15 @@ var CustomMap = (function () {
       $scope.$watchCollection('vm.feed', _lodash2['default'].debounce(function (res) {
         _this.update(res);
       }, 500));
+      $scope.$watchCollection('vm.center', function (res) {
+        return _this.setPosition(res);
+      });
+
+      this.setPosition = function (pos) {
+        if (map && pos) {
+          map.panTo(new google.maps.LatLng(pos.latitude, pos.longitude));
+        }
+      };
 
       this.update = function (res) {
 
@@ -270,15 +279,15 @@ var CustomMap = (function () {
   _createClass(CustomMap, [{
     key: 'link',
     value: function link($scope, $element, $attr) {
-      console.log('link fn called');
       var el = $element[0].children[0];
-      if (document.readyState === "complete") this.initialize(el);else google.maps.event.addDomListener(window, 'load', this.initialize(el));
+      if (document.readyState === "complete") this.initialize(el, $scope.vm.center);else google.maps.event.addDomListener(window, 'load', this.initialize(el, $scope.vm.center));
     }
   }, {
     key: 'initialize',
     value: function initialize(el) {
-      console.log('loaded');
-      var mapOptions = { center: new google.maps.LatLng(0, 0), zoom: 1, mapTypeId: google.maps.MapTypeId.ROADMAP };
+      var pos = arguments.length <= 1 || arguments[1] === undefined ? { longitude: 0, latitude: 0 } : arguments[1];
+
+      var mapOptions = { center: new google.maps.LatLng(pos.latitude, pos.longitude), zoom: 1, mapTypeId: google.maps.MapTypeId.ROADMAP };
       map = new google.maps.Map(el, mapOptions);
     }
   }]);
@@ -333,7 +342,7 @@ var buf = [];
 var jade_mixins = {};
 var jade_interp;
 
-buf.push("<h1>Welcome to Hit the breaks {{vm.user}}!</h1><button ng-if=\"!vm.isUser\" ng-click=\"vm.authenticate('facebook')\">Login via Facebook to start reporting incidents</button><button ng-if=\"vm.isUser\" ui-sref=\"report\">Report</button><button ui-sref=\"map\">View Map</button>");;return buf.join("");
+buf.push("<h1>Welcome to Hit the breaks {{vm.user}}!</h1><button ng-if=\"!vm.isUser\" ng-click=\"vm.authenticate('facebook')\" class=\"pure-button pure-button-primary\">Login via Facebook to start reporting incidents</button><button ng-if=\"vm.isUser\" ui-sref=\"report\" class=\"pure-button pure-button-primary\">Report</button><button ui-sref=\"map\" class=\"pure-button pure-button-primary\">View Map</button>");;return buf.join("");
 };
 },{"jade/runtime":19}],7:[function(require,module,exports){
 "use strict";
@@ -361,7 +370,7 @@ var buf = [];
 var jade_mixins = {};
 var jade_interp;
 
-buf.push("<h1>Map</h1><map feed=\"vm.activity\" width=\"100%\" height=\"100%\" position=\"absolute\"></map>");;return buf.join("");
+buf.push("<h1>Map</h1><map feed=\"vm.feed\" width=\"100%\" height=\"100%\" position=\"absolute\" center=\"vm.center\"></map>");;return buf.join("");
 };
 },{"jade/runtime":19}],9:[function(require,module,exports){
 'use strict';
@@ -370,16 +379,16 @@ Object.defineProperty(exports, '__esModule', {
 	value: true
 });
 
-exports['default'] = /*@ngInject*/["$scope", "socket", function ($scope, socket) {
+exports['default'] = /*@ngInject*/["$scope", "socket", "$q", function ($scope, socket, $q) {
 	var _this = this;
 
-	this.activities = [];
+	this.feed = [];
 
 	socket.emit('activity:changes:start', {});
 
 	socket.on('activity:changes', function (change) {
 		if (change.new_val === null) console.log(change.old_val.id); // remove using change.old_val.id
-		else _this.activities.push(change.new_val);
+		else _this.feed.push(change.new_val);
 	});
 
 	this.start = function () {
@@ -387,11 +396,25 @@ exports['default'] = /*@ngInject*/["$scope", "socket", function ($scope, socket)
 	};
 
 	this.stop = function () {
-		_this.activities = []; // clear map
+		_this.feed = []; // clear map
 		socket.emit('activity:changes:stop'); // disconnect
 	};
 
 	this.change = function () {};
+
+	this.getGeo = function () {
+		var q = $q.defer();
+		navigator.geolocation.getCurrentPosition(function (pos) {
+			q.resolve({ latitude: pos.coords.latitude, longitude: pos.coords.longitude });
+		}, function (error) {
+			q.reject(error);
+		});
+		return q.promise;
+	};
+
+	this.getGeo().then(function (res) {
+		return _this.center = res;
+	});
 }];
 
 module.exports = exports['default'];
@@ -404,7 +427,7 @@ var buf = [];
 var jade_mixins = {};
 var jade_interp;
 
-buf.push("<h1>Hey {{ vm.user | json }}</h1><button ng-click=\"vm.report()\">Report current location</button><button ng-click=\"vm.logout()\">Logout</button>");;return buf.join("");
+buf.push("<h1>Hey {{ vm.user | json }}</h1><button ng-click=\"vm.report()\" class=\"pure-button pure-button-primary\">Report current location</button>");;return buf.join("");
 };
 },{"jade/runtime":19}],11:[function(require,module,exports){
 "use strict";

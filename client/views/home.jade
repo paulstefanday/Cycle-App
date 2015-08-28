@@ -1,9 +1,9 @@
 h1 Welcome to Hit the breaks {{vm.user}}!
 
 //- If not logged in
-button(ng-if="!vm.isUser" ng-click="vm.authenticate('facebook')") Login via Facebook to start reporting incidents
+button.pure-button.pure-button-primary(ng-if="!vm.isUser" ng-click="vm.authenticate('facebook')") Login via Facebook to start reporting incidents
 
 //- If logged in
-button(ng-if="vm.isUser" ui-sref="report") Report
+button.pure-button.pure-button-primary(ng-if="vm.isUser" ui-sref="report") Report
 
-button(ui-sref="map") View Map
+button.pure-button.pure-button-primary(ui-sref="map") View Map

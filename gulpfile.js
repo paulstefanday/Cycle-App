@@ -11,7 +11,8 @@ var dist = './public';
 gulp.task('css', function() {
   return gulp.src([
       './node_modules/sweetalert/dist/sweetalert.css',
-      './client/index.css'
+      './client/index.css',
+      './node_modules/purecss/build/pure.css'
     ])
     .pipe(minifyCss({compatibility: 'ie8'}))
     .pipe(concat('index.css'))
