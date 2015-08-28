@@ -8,3 +8,10 @@ button {
 button:hover {
   background: black;
 }
+
+.fly {
+	position: fixed;
+	z-index: 10000;
+	top: 0;
+	right: 0
+}

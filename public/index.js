@@ -228,8 +228,6 @@ var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
-var map;
-
 var CustomMap = (function () {
   function CustomMap() {
     _classCallCheck(this, CustomMap);
@@ -242,6 +240,7 @@ var CustomMap = (function () {
     this.controller = /*@ngInject*/["$scope", function ($scope) {
       var _this = this;
 
+      this.map;
       this.items = [];
       this.markers = [];
       this.style = { width: this.height, height: this.width, position: this.position, float: 'left', top: 0, left: 0 };
@@ -251,14 +250,11 @@ var CustomMap = (function () {
       }, 500));
 
       this.update = function (res) {
-
-        var diff = _lodash2['default'].difference(res, _this.items);
-
-        diff.forEach(function (item) {
+        return _lodash2['default'].difference(res, _this.items).forEach(function (item) {
           _this.items.push(item);
           var marker = new google.maps.Marker({
-            position: new google.maps.LatLng(item.lat, item.lng),
-            map: map,
+            position: new google.maps.LatLng(item.latitude, item.longitude),
+            map: _this.map,
             animation: google.maps.Animation.DROP
           });
           _this.markers.push(marker);
@@ -270,16 +266,13 @@ var CustomMap = (function () {
   _createClass(CustomMap, [{
     key: 'link',
     value: function link($scope, $element, $attr) {
-      console.log('link fn called');
-      var el = $element[0].children[0];
-      if (document.readyState === "complete") this.initialize(el);else google.maps.event.addDomListener(window, 'load', this.initialize(el));
-    }
-  }, {
-    key: 'initialize',
-    value: function initialize(el) {
-      console.log('loaded');
       var mapOptions = { center: new google.maps.LatLng(0, 0), zoom: 1, mapTypeId: google.maps.MapTypeId.ROADMAP };
-      map = new google.maps.Map(el, mapOptions);
+      var el = $element[0].children[0];
+      var init = function init(el) {
+        return $scope.vm.map = new google.maps.Map(el, mapOptions);
+      };
+
+      if (document.readyState === "complete") init(el);else google.maps.event.addDomListener(window, 'load', init(el));
     }
   }]);
 
@@ -322,7 +315,7 @@ angular.module(name, ['satellizer', 'btford.socket-io', 'ui.router', 'oitozero.n
 
 // App Parts
 (_require = require('./bootstrap')(name)).directive.apply(_require, _toConsumableArray(require('./directives/map'))).factory('socket', /*@ngInject*/["socketFactory", function (socketFactory) {
-  return socketFactory({ prefix: '', ioSocket: io.connect('http://localhost:3000') });
+	return socketFactory({ prefix: '', ioSocket: io.connect('http://localhost:3000/') });
 }]);
 
 },{"./bootstrap":1,"./config":2,"./directives/map":3,"./global":4,"angular":16,"angular-socket-io":12,"angular-sweetalert":13,"angular-ui-router":14,"satellizer":21,"socket.io-client":22,"sweetalert":72}],6:[function(require,module,exports){
@@ -361,7 +354,7 @@ var buf = [];
 var jade_mixins = {};
 var jade_interp;
 
-buf.push("<h1>Map</h1><map feed=\"vm.activity\" width=\"100%\" height=\"100%\" position=\"absolute\"></map>");;return buf.join("");
+buf.push("<div class=\"fly\"><h1>Map</h1><pre>{{ vm.map | json }}</pre></div><map feed=\"vm.activities\" width=\"100%\" height=\"100%\" position=\"absolute\"></map>");;return buf.join("");
 };
 },{"jade/runtime":19}],9:[function(require,module,exports){
 'use strict';
@@ -378,12 +371,12 @@ exports['default'] = /*@ngInject*/["$scope", "socket", function ($scope, socket)
 	socket.emit('activity:changes:start', {});
 
 	socket.on('activity:changes', function (change) {
-		if (change.new_val === null) console.log(change.old_val.id); // remove using change.old_val.id
-		else _this.activities.push(change.new_val);
+		if (change.new_val) _this.activities.push(change.new_val);
 	});
 
 	this.start = function () {
-		socket.emit('activity:changes:start', { filter: { type: _this.type } });
+		var query = {}; // filter: {}
+		socket.emit('activity:changes:start', query);
 	};
 
 	this.stop = function () {
@@ -391,7 +384,10 @@ exports['default'] = /*@ngInject*/["$scope", "socket", function ($scope, socket)
 		socket.emit('activity:changes:stop'); // disconnect
 	};
 
-	this.change = function () {};
+	this.change = function () {
+		$scope.stop();
+		$scope.start();
+	};
 }];
 
 module.exports = exports['default'];

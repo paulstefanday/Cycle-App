@@ -1,6 +1,6 @@
-const io = require('socket.io-client'),
-      angular = require('angular'),
-      name = 'app';
+var io = require('socket.io-client'),
+    angular = require('angular'),
+    name = 'app';
 
 require('angular-socket-io');
 require('angular-ui-router');
@@ -13,7 +13,7 @@ angular.module(name, [
 	'satellizer',
 	'btford.socket-io',
 	'ui.router',
-  'oitozero.ngSweetAlert'
+	'oitozero.ngSweetAlert'
 ])
   .config(require('./config'))
   .run(require('./global'))
@@ -22,7 +22,9 @@ angular.module(name, [
 // App Parts
 require('./bootstrap')(name)
 	.directive(...require('./directives/map'))
-	.factory('socket', /*@ngInject*/ (socketFactory) => socketFactory({ prefix: '', ioSocket: io.connect('http://localhost:3000')}))
+	.factory('socket', /*@ngInject*/ function(socketFactory) { 
+		return socketFactory({ prefix: '', ioSocket: io.connect('http://localhost:3000/') }) 
+	})
 
 
 
