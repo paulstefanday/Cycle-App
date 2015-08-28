@@ -6,12 +6,26 @@ class Nav {
     this.bindToController = true;
     this.template = require('./nav.jade');
     this.scope = {};
-    this.controller = /*@ngInject*/ function($scope, $rootScope){
+    this.controller = /*@ngInject*/ function($auth, $state){
 
-      $rootScope.showNav = false;
+      this.showNav = false;
+
+      this.hide = () => this.showNav = false
+
+      this.login = () => {
+        $auth.authenticate('facebook');
+        this.hide();
+      }
+
+      this.logout = () => {
+        $auth.logout();
+        this.hide();
+      }
+
+      this.loggedIn = () => $auth.isAuthenticated()
 
     }
-
+  }
 }
 
 export default [ 'nav', Nav ]

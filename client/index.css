@@ -234,5 +234,9 @@ Hides the menu at `48em`, but modify this based on your app's needs.
     }
 }
 
-
-
+.fly {
+	position: fixed;
+	z-index: 10000;
+	top: 0;
+	right: 0
+}

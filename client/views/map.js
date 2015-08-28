@@ -5,12 +5,13 @@ export default /*@ngInject*/ function ($scope, socket, $q) {
 	socket.emit('activity:changes:start', {});
 
 	socket.on('activity:changes', change => {
-		if(change.new_val === null) console.log(change.old_val.id); // remove using change.old_val.id
-		else this.feed.push(change.new_val);
+    console.log(change)
+		if(change.new_val) this.feed.push(change.new_val);
 	});
 
 	this.start = () => {
-		socket.emit('activity:changes:start', { filter: { type: this.type } });
+		let query = {}; // filter: {}
+		socket.emit('activity:changes:start', query);
 	}
 
 	this.stop = () => {
@@ -19,7 +20,8 @@ export default /*@ngInject*/ function ($scope, socket, $q) {
 	}
 
 	this.change = () => {
-
+		$scope.stop();
+		$scope.start();
 	}
 
   this.getGeo = () => {
@@ -28,6 +30,9 @@ export default /*@ngInject*/ function ($scope, socket, $q) {
     return q.promise;
   }
 
-  this.getGeo().then(res => this.center = res);
+  this.getGeo().then(res => {
+    this.center = res;
+    console.log(res);
+  });
 
 }

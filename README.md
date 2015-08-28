@@ -16,8 +16,7 @@ NODE_ENV=prod PORT=3000 pm2 start server.js --node-args="--harmony"
 - add less support
 - add in styles
 - add in logo
-- get map working
-- get basic feed loading into map
 - get feed from within a location
 - add nav directive
 - prepopulate database
+

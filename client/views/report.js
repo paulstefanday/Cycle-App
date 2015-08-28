@@ -9,8 +9,6 @@ export default /*@ngInject*/ function ($q, $http, $auth, SweetAlert) {
 
   this.user = $auth.getPayload();
 
-  this.logout = () => { $auth.logout(); };
-
   this.getGeo = () => {
     let q = $q.defer();
     navigator.geolocation.getCurrentPosition(pos => { q.resolve(pos.coords); }, error => { q.reject(error); });

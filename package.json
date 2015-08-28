@@ -94,6 +94,7 @@
     "koa-livereload": "^0.1.23",
     "lessify": "^1.0.1",
     "mocha": "^2.2.5",
+    "socket.io": "^1.3.6",
     "supertest": "^1.0.1"
   }
 }
