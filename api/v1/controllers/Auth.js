@@ -29,7 +29,7 @@ module.exports.facebook = function *(next) {
   if(!exists) exists = yield H.userCreate(user.body, 'facebook'); // create user
   // TODO: get profile pic
 
-  var res = { token: jwt.sign({ id: exists.id }, secret)  };
+  var res = { token: jwt.sign({ id: exists.id, name: exists.name, email: exists.email }, secret)  };
   console.log(res);
 
   this.body = res;

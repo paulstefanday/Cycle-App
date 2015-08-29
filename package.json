@@ -54,6 +54,7 @@
     "koa-session": "^3.3.1",
     "koa-static": "^1.4.8",
     "koa-static-folder": "^0.1.5",
+    "ladda-angular": "^1.0.1",
     "lodash": "^3.10.1",
     "mailman": "^0.3.2",
     "mocha-generators": "^1.1.1",

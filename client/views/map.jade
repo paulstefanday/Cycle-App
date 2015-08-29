@@ -1,5 +1,3 @@
-.fly
-	h1 Map
-	pre {{ vm.map | json }}
+button.report-button.ladda-button(ng-click="vm.report()" ladda-button="vm.laddaLoading" data-style="expand-right") Report
 
 map(feed="vm.feed" width="100%" height="100%" position="absolute" center="vm.center")

@@ -7,13 +7,15 @@ require('angular-ui-router');
 require('satellizer');
 require('sweetalert');
 require('angular-sweetalert');
+require('ladda-angular');
 
 // App
 angular.module(name, [
 	'satellizer',
 	'btford.socket-io',
 	'ui.router',
-	'oitozero.ngSweetAlert'
+	'oitozero.ngSweetAlert',
+  'ladda'
 ])
   .config(require('./config'))
   .run(require('./global'))

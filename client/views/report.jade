@@ -1,6 +1,7 @@
-h1 Hey {{ vm.user | json }}
+.box
+  h1 Hey {{ vm.user.name }}
 
-button.pure-button.pure-button-primary(ng-click="vm.report()") Report current location
+  button.pure-button.pure-button-primary.ladda-button(ladda-button="vm.laddaLoading" data-style="expand-right" ng-click="vm.report()") Report current location
 
 //- p or
 

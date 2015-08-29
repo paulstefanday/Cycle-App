@@ -7,7 +7,7 @@ var M = require(__base+'/api/models'),
 
 module.exports = {
 
-	
+
 	userExists: function* (email) { // Check if user exists
 
 		var existingUser = yield M.User.filter({email: email }).run();
@@ -17,14 +17,14 @@ module.exports = {
 		else return false;
 	},
 
-	
+
 	userCreate: function* (data, provider) { // Create new user
 
 		var user, doc, realPassword, password;
 
 		if(provider) {
-			
-			user = new M.User({email: data.email, first_name: data.name, provider_id: data.id, provider: provider });
+
+			user = new M.User({email: data.email, name: data.name, provider_id: data.id, provider: provider });
 			doc = yield user.save();
 
 		} else {
@@ -49,7 +49,7 @@ module.exports = {
 
 	// Hash password
 	hashPassword: function* (password) {
-		
+
 		// encrypt pass - concider putting in model pre function
 		var salt = yield bcrypt.genSalt(10);
 		var hash = yield bcrypt.hash(password, salt);

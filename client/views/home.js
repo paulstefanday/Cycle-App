@@ -4,6 +4,6 @@ export default /*@ngInject*/ function($auth) {
     $auth.authenticate(provider);
   };
 
-  this.isUser = $auth.isAuthenticated();
+  this.isUser = () => $auth.isAuthenticated()
 
 }

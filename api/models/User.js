@@ -7,7 +7,7 @@ var 	config = require(__base+'/api/config/config.js'),
 module.exports = thinky.createModel("users",{
     id: type.string(),
     email: type.string().email().required(),
-    first_name: type.string().required(),
+    first_name: type.string(),
     last_name: type.string(),
     password: type.string(),
     createdAt: type.date().default(r.now())
