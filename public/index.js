@@ -395,7 +395,7 @@ var buf = [];
 var jade_mixins = {};
 var jade_interp;
 
-buf.push("<div class=\"box\"><img src=\"public/logo.png\" style=\"margin-top:-40px;\"/><button ng-if=\"!vm.isUser()\" ng-click=\"vm.authenticate('facebook')\" ladda-button=\"vm.laddaLoading\" data-style=\"expand-right\" class=\"ladda-button\">Login via Facebook</button><button ng-if=\"vm.isUser()\" ui-sref=\"report\" class=\"ladda-button\">Report</button></div>");;return buf.join("");
+buf.push("<div id=\"home\" class=\"box\"><div class=\"logo\"><img src=\"public/logo.png\" style=\"margin-top:-40px;\"/></div><br/><button ng-if=\"!vm.isUser()\" ng-click=\"vm.authenticate('facebook')\" ladda-button=\"vm.laddaLoading\" data-style=\"expand-right\" class=\"ladda-button\">Login via Facebook</button><button ng-if=\"vm.isUser()\" ui-sref=\"report\" class=\"ladda-button\">Report</button></div>");;return buf.join("");
 };
 },{"jade/runtime":21}],9:[function(require,module,exports){
 "use strict";

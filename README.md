@@ -13,11 +13,9 @@ test: 54.153.229.210 -i funkey.pem
 NODE_ENV=prod PORT=3000 pm2 start server.js --node-args="--harmony"
 
 ## Todo
-- add in styles (gradients on background)
-- add in logo with styles
 - get social login working on live site
-- add in better map directive
 
+- add in better map directive
 - get feed from within a location
 - prepopulate database
 
