@@ -39,7 +39,10 @@ export default /*@ngInject*/ function ($scope, socket, $q, $http, SweetAlert) {
         SweetAlert.swal("It worked!", "Report sent successfully!", "success")
         this.laddaLoading = false;
       })
-      .catch(error => SweetAlert.swal("It failed!", "Please try again", "error"))
+      .catch(error => {
+        SweetAlert.swal("It failed!", "Please try again", "error")
+        this.laddaLoading = false;
+      })
   }
 
   this.getGeo = () => {

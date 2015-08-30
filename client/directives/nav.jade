@@ -1,17 +1,17 @@
-#layout(ng-class="{ active : vm.showNav }")
-  #menuLink.menu-link(ng-click="vm.showNav = !vm.showNav")
-    span
-  #menu
-    .pure-menu
-      //- a.pure-menu-heading(href='#') Company
-      ul.pure-menu-list
-        li.pure-menu-item
-          a.pure-menu-link(href='#/' ng-click="vm.hide()") Home
-        li.pure-menu-item
-          a.pure-menu-link(href='#/map' ng-click="vm.hide()") Map
-        li.pure-menu-item
-          a.pure-menu-link(href='#/report' ng-click="vm.hide()" ng-show="vm.loggedIn()") Report
-        li.pure-menu-item
-          a.pure-menu-link(href='' ng-hide="vm.loggedIn()" ng-click="vm.login()") Login
-        li.pure-menu-item
-          a.pure-menu-link(href='' ng-show="vm.loggedIn()" ng-click="vm.logout()") Logout
+#navigation(ng-class="{ active : vm.showNav }")
+
+  button.menu-link(ng-click="vm.showNav = !vm.showNav")
+    i.ion-navicon(ng-hide="vm.showNav")
+    i.ion-ios-close-empty(ng-show="vm.showNav")
+
+  ul#menu
+    li
+      a(href='#/' ng-click="vm.hide()") Home
+    li
+      a(href='#/map' ng-click="vm.hide()") Map
+    li
+      a(href='#/report' ng-click="vm.hide()" ng-show="vm.loggedIn()") Report
+    li
+      a(href='' ng-hide="vm.loggedIn()" ng-click="vm.login()") Login
+    li
+      a(href='' ng-show="vm.loggedIn()" ng-click="vm.logout()") Logout

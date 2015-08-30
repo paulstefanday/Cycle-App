@@ -303,7 +303,7 @@ var buf = [];
 var jade_mixins = {};
 var jade_interp;
 
-buf.push("<div id=\"layout\" ng-class=\"{ active : vm.showNav }\"><div id=\"menuLink\" ng-click=\"vm.showNav = !vm.showNav\" class=\"menu-link\"><span></span></div><div id=\"menu\"><div class=\"pure-menu\"><ul class=\"pure-menu-list\"><li class=\"pure-menu-item\"><a href=\"#/\" ng-click=\"vm.hide()\" class=\"pure-menu-link\">Home</a></li><li class=\"pure-menu-item\"><a href=\"#/map\" ng-click=\"vm.hide()\" class=\"pure-menu-link\">Map</a></li><li class=\"pure-menu-item\"><a href=\"#/report\" ng-click=\"vm.hide()\" ng-show=\"vm.loggedIn()\" class=\"pure-menu-link\">Report</a></li><li class=\"pure-menu-item\"><a href=\"\" ng-hide=\"vm.loggedIn()\" ng-click=\"vm.login()\" class=\"pure-menu-link\">Login</a></li><li class=\"pure-menu-item\"><a href=\"\" ng-show=\"vm.loggedIn()\" ng-click=\"vm.logout()\" class=\"pure-menu-link\">Logout</a></li></ul></div></div></div>");;return buf.join("");
+buf.push("<div id=\"navigation\" ng-class=\"{ active : vm.showNav }\"><button ng-click=\"vm.showNav = !vm.showNav\" class=\"menu-link\"><i ng-hide=\"vm.showNav\" class=\"ion-navicon\"></i><i ng-show=\"vm.showNav\" class=\"ion-ios-close-empty\"></i></button><ul id=\"menu\"><li><a href=\"#/\" ng-click=\"vm.hide()\">Home</a></li><li><a href=\"#/map\" ng-click=\"vm.hide()\">Map</a></li><li><a href=\"#/report\" ng-click=\"vm.hide()\" ng-show=\"vm.loggedIn()\">Report</a></li><li><a href=\"\" ng-hide=\"vm.loggedIn()\" ng-click=\"vm.login()\">Login</a></li><li><a href=\"\" ng-show=\"vm.loggedIn()\" ng-click=\"vm.logout()\">Logout</a></li></ul></div>");;return buf.join("");
 };
 },{"jade/runtime":21}],5:[function(require,module,exports){
 'use strict';
@@ -395,7 +395,7 @@ var buf = [];
 var jade_mixins = {};
 var jade_interp;
 
-buf.push("<div class=\"box\"><img src=\"public/logo.png\" style=\"margin-top:-40px;\"/><button ng-if=\"!vm.isUser()\" ng-click=\"vm.authenticate('facebook')\" ladda-button=\"vm.laddaLoading\" data-style=\"expand-right\" class=\"ladda-button\">Login via Facebook</button><button ng-if=\"vm.isUser()\" ui-sref=\"report\" class=\"ladda-button\">Report</button><br/><br/><button ui-sref=\"map\" class=\"ladda-button\">View Map</button></div>");;return buf.join("");
+buf.push("<div class=\"box\"><img src=\"public/logo.png\" style=\"margin-top:-40px;\"/><button ng-if=\"!vm.isUser()\" ng-click=\"vm.authenticate('facebook')\" ladda-button=\"vm.laddaLoading\" data-style=\"expand-right\" class=\"ladda-button\">Login via Facebook</button><button ng-if=\"vm.isUser()\" ui-sref=\"report\" class=\"ladda-button\">Report</button></div>");;return buf.join("");
 };
 },{"jade/runtime":21}],9:[function(require,module,exports){
 "use strict";
@@ -484,7 +484,8 @@ exports['default'] = /*@ngInject*/["$scope", "socket", "$q", "$http", "SweetAler
       SweetAlert.swal("It worked!", "Report sent successfully!", "success");
       _this.laddaLoading = false;
     })['catch'](function (error) {
-      return SweetAlert.swal("It failed!", "Please try again", "error");
+      SweetAlert.swal("It failed!", "Please try again", "error");
+      _this.laddaLoading = false;
     });
   };
 
