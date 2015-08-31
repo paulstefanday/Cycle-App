@@ -18,6 +18,8 @@ class CustomMap {
           disable-default-u-i="true"
           zoom-to-include-markers="auto">
 
+          <bicycling-layer></bicycling-layer>
+
           <marker animation="DROP" ng-repeat="marker in vm.items" position="{{ marker.latitude }}, {{marker.longitude}}"></marker>
 
         </map>
