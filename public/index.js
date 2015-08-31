@@ -233,23 +233,22 @@ var CustomMap = (function () {
     this.restrict = 'E';
     this.controllerAs = 'vm';
     this.bindToController = true;
-    this.template = '<div ng-if="vm.center">\n        <map  ng-style="vm.style" zoom="16"\n          center="{{ vm.center.latitude }}, {{vm.center.longitude}}"\n          draggable="true"\n          dragging-cursor="move"\n          keyboard-shortcuts="false"\n          max-zoom="14"\n          min-zoom="6"\n          tilt="45"\n          disable-default-u-i="true"\n          zoom-to-include-markers="auto">\n\n        <marker ng-repeat="marker in vm.items" position="{{ marker.latitude }}, {{marker.longitude}}"></marker>\n\n        </map>\n      </div>\n    ';
+    this.template = '\n        <map ng-style="vm.style" zoom="16"\n          center="{{ vm.center.latitude }}, {{vm.center.longitude}}"\n          draggable="true"\n          dragging-cursor="move"\n          keyboard-shortcuts="false"\n          max-zoom="14"\n          min-zoom="6"\n          tilt="45"\n          disable-default-u-i="true"\n          zoom-to-include-markers="auto">\n\n          <marker animation="DROP" ng-repeat="marker in vm.items" position="{{ marker.latitude }}, {{marker.longitude}}"></marker>\n\n        </map>\n    ';
 
     this.scope = { height: '@', width: '@', feed: '=', markers: '=', position: '@', center: '=' };
+
     this.controller = /*@ngInject*/["$scope", function ($scope) {
       var _this = this;
 
-      this.map;
       this.items = [];
+
       this.center = { latitude: -33.87, longitude: 151.2 }; // Sydney
+
       this.style = { width: this.height, height: this.width, position: this.position, float: 'left', top: 0, left: 0 };
 
       $scope.$watchCollection('vm.feed', _lodash2['default'].debounce(function (res) {
-        _this.update(res);
+        return _this.update(res);
       }, 500));
-      $scope.$watchCollection('vm.center', function (res) {
-        return console.log(res);
-      });
 
       this.update = function (res) {
         return _lodash2['default'].difference(res, _this.items).forEach(function (item) {
@@ -268,6 +267,9 @@ var CustomMap = (function () {
 })();
 
 exports['default'] = ['customMap', CustomMap];
+
+//http://ngmap.github.io/drawings.html#
+//https://rawgit.com/allenhwkim/angularjs-google-maps/master/build/docs/ngMap.map.html
 module.exports = exports['default'];
 
 },{"lodash":22}],4:[function(require,module,exports){

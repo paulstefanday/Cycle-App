@@ -6,8 +6,8 @@ class CustomMap {
     this.restrict = 'E';
     this.controllerAs = 'vm';
     this.bindToController = true;
-    this.template = `<div ng-if="vm.center">
-        <map  ng-style="vm.style" zoom="16"
+    this.template = `
+        <map ng-style="vm.style" zoom="16"
           center="{{ vm.center.latitude }}, {{vm.center.longitude}}"
           draggable="true"
           dragging-cursor="move"
@@ -18,22 +18,22 @@ class CustomMap {
           disable-default-u-i="true"
           zoom-to-include-markers="auto">
 
-        <marker ng-repeat="marker in vm.items" position="{{ marker.latitude }}, {{marker.longitude}}"></marker>
+          <marker animation="DROP" ng-repeat="marker in vm.items" position="{{ marker.latitude }}, {{marker.longitude}}"></marker>
 
         </map>
-      </div>
     `;
 
     this.scope = { height:'@', width:'@', feed:'=', markers: '=', position: '@' , center: '=' };
+
     this.controller = /*@ngInject*/ function($scope){
 
-      this.map;
       this.items = [];
+
       this.center = { latitude: -33.87, longitude: 151.2 }; // Sydney
+
       this.style = { width:this.height, height:this.width, position:this.position, float:'left', top: 0, left: 0 };
 
-      $scope.$watchCollection('vm.feed', _.debounce((res) => { this.update(res); }, 500));
-      $scope.$watchCollection('vm.center', res => console.log(res));
+      $scope.$watchCollection('vm.feed', _.debounce((res) => this.update(res), 500));
 
       this.update = (res) => _.difference(res, this.items).forEach(item => this.items.push(item))
 
@@ -46,3 +46,7 @@ class CustomMap {
 }
 
 export default [ 'customMap', CustomMap ]
+
+
+//http://ngmap.github.io/drawings.html#
+//https://rawgit.com/allenhwkim/angularjs-google-maps/master/build/docs/ngMap.map.html
