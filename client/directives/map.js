@@ -6,51 +6,43 @@ class CustomMap {
     this.restrict = 'E';
     this.controllerAs = 'vm';
     this.bindToController = true;
-    this.template = `<div ng-style="vm.style"></div>`;
+    this.template = `<div ng-if="vm.center">
+        <map  ng-style="vm.style" zoom="16"
+          center="{{ vm.center.latitude }}, {{vm.center.longitude}}"
+          draggable="true"
+          dragging-cursor="move"
+          keyboard-shortcuts="false"
+          max-zoom="14"
+          min-zoom="6"
+          tilt="45"
+          disable-default-u-i="true"
+          zoom-to-include-markers="auto">
+
+        <marker ng-repeat="marker in vm.items" position="{{ marker.latitude }}, {{marker.longitude}}"></marker>
+
+        </map>
+      </div>
+    `;
+
     this.scope = { height:'@', width:'@', feed:'=', markers: '=', position: '@' , center: '=' };
     this.controller = /*@ngInject*/ function($scope){
 
       this.map;
       this.items = [];
-      this.markers = [];
+      this.center = { latitude: -33.87, longitude: 151.2 }; // Sydney
       this.style = { width:this.height, height:this.width, position:this.position, float:'left', top: 0, left: 0 };
 
       $scope.$watchCollection('vm.feed', _.debounce((res) => { this.update(res); }, 500));
-      $scope.$watchCollection('vm.center', res => this.setPosition(res));
+      $scope.$watchCollection('vm.center', res => console.log(res));
 
-      this.setPosition = pos => {
-        if(this.map && pos) {
-          this.map.panTo(new google.maps.LatLng(pos.latitude, pos.longitude))
-        }
-      }
-
-      this.update = (res) => _.difference(res, this.items).forEach(item => {
-        this.items.push(item);
-        let marker = new google.maps.Marker({
-          position: new google.maps.LatLng(item.latitude, item.longitude),
-          map: this.map,
-          animation: google.maps.Animation.DROP
-        });
-        this.markers.push(marker);
-      })
+      this.update = (res) => _.difference(res, this.items).forEach(item => this.items.push(item))
 
     }
 
   }
 
-  link($scope, $element, $attr) {
-
-    var el = $element[0].children[0];
-    var init = (el, pos={ longitude: 0, latitude: 0 }) => {
-      var mapOptions = { center: new google.maps.LatLng(pos.latitude, pos.longitude), zoom: 12, mapTypeId: google.maps.MapTypeId.ROADMAP };
-      $scope.vm.map = new google.maps.Map(el, mapOptions);
-      console.log('map created')
-    }
-
-    if (document.readyState === "complete") init(el)
-    else google.maps.event.addDomListener(window, 'load', init(el));
-  }
+  link($scope, $element, $attr) { }
 
 }
 
-export default [ 'map', CustomMap ]
+export default [ 'customMap', CustomMap ]

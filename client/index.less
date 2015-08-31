@@ -34,27 +34,38 @@ h1, h2, h3, h4 {
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f85032', endColorstr='#e73827', GradientType=1 );
  }
 
-button {
-  margin-left:5px !important;
-  margin-right:5px !important;
+button, .ladda-button {
+  margin-left:5px ;
+  margin-right:5px ;
   background-color: @mainColor !important;
-  color: #fff !important;
-  -webkit-box-shadow: 0 2px 1px 0 rgba(1, 54, 146, 0.77);
-  -moz-box-shadow:0 2px 1px 0 rgba(1, 54, 146, 0.77);
-  box-shadow: 0 2px 1px 0 rgba(1, 54, 146, 0.77);
+  color: #fff ;
+  -webkit-box-shadow: 0 2px 1px 0 darken(@mainColor, 10%);
+  -moz-box-shadow:0 2px 1px 0 darken(@mainColor, 10%);
+  box-shadow: 0 2px 1px 0 darken(@mainColor, 10%);
   border-bottom: 4px solid lighten(@mainColor, 10%) !important;
   font-size: @textSize;
-  border-radius: 5px !important
+  border-radius: 5px
 }
 
-.report-button {
-  width: 200px;
-  height: 60px;
-  bottom:20px;
-  left: 50%;
-  margin-left: -100px !important;
-  position: absolute !important;
-  z-index: 10000;
+button:hover, .ladda-button:hover {
+  margin-top: -2px;
+  background: darken(@mainColor, 5%);
+  -webkit-box-shadow: 0 5px 6px 0 darken(@mainColor, 10%);
+  -moz-box-shadow:0 5px 6px 0 darken(@mainColor, 10%);
+  box-shadow: 0 5px 6px 0 darken(@mainColor, 10%);
+}
+
+button:active, .ladda-button:active {
+  margin-top: 0px;
+  -webkit-box-shadow: 0 2px 1px 0 darken(@mainColor, 10%);
+  -moz-box-shadow:0 2px 1px 0 darken(@mainColor, 10%);
+  box-shadow: 0 2px 1px 0 darken(@mainColor, 10%);
+}
+
+.sweet-alert {
+  button:hover {
+    margin-top: 26px;
+  }
 }
 
 .box {

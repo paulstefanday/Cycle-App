@@ -1,6 +1,7 @@
 export default /*@ngInject*/ function ($scope, socket, $q, $http, SweetAlert) {
 
-	this.feed = [];
+	this.feed = []
+  // this.center = { longitude: 0, latitude: 0 }
 
 	socket.emit('activity:changes:start', {});
 
@@ -22,7 +23,11 @@ export default /*@ngInject*/ function ($scope, socket, $q, $http, SweetAlert) {
 
   this.getGeo = () => {
     let q = $q.defer();
-    navigator.geolocation.getCurrentPosition(pos => { q.resolve({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }); }, error => { q.reject(error); });
+    navigator.geolocation.getCurrentPosition(pos => {
+      q.resolve({ latitude: pos.coords.latitude, longitude: pos.coords.longitude });
+    }, error => {
+      q.reject(error);
+    });
     return q.promise;
   }
 

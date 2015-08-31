@@ -233,38 +233,27 @@ var CustomMap = (function () {
     this.restrict = 'E';
     this.controllerAs = 'vm';
     this.bindToController = true;
-    this.template = '<div ng-style="vm.style"></div>';
+    this.template = '<div ng-if="vm.center">\n        <map  ng-style="vm.style" zoom="16"\n          center="{{ vm.center.latitude }}, {{vm.center.longitude}}"\n          draggable="true"\n          dragging-cursor="move"\n          keyboard-shortcuts="false"\n          max-zoom="14"\n          min-zoom="6"\n          tilt="45"\n          disable-default-u-i="true"\n          zoom-to-include-markers="auto">\n\n        <marker ng-repeat="marker in vm.items" position="{{ marker.latitude }}, {{marker.longitude}}"></marker>\n\n        </map>\n      </div>\n    ';
+
     this.scope = { height: '@', width: '@', feed: '=', markers: '=', position: '@', center: '=' };
     this.controller = /*@ngInject*/["$scope", function ($scope) {
       var _this = this;
 
       this.map;
       this.items = [];
-      this.markers = [];
+      this.center = { latitude: -33.87, longitude: 151.2 }; // Sydney
       this.style = { width: this.height, height: this.width, position: this.position, float: 'left', top: 0, left: 0 };
 
       $scope.$watchCollection('vm.feed', _lodash2['default'].debounce(function (res) {
         _this.update(res);
       }, 500));
       $scope.$watchCollection('vm.center', function (res) {
-        return _this.setPosition(res);
+        return console.log(res);
       });
-
-      this.setPosition = function (pos) {
-        if (_this.map && pos) {
-          _this.map.panTo(new google.maps.LatLng(pos.latitude, pos.longitude));
-        }
-      };
 
       this.update = function (res) {
         return _lodash2['default'].difference(res, _this.items).forEach(function (item) {
-          _this.items.push(item);
-          var marker = new google.maps.Marker({
-            position: new google.maps.LatLng(item.latitude, item.longitude),
-            map: _this.map,
-            animation: google.maps.Animation.DROP
-          });
-          _this.markers.push(marker);
+          return _this.items.push(item);
         });
       };
     }];
@@ -272,25 +261,13 @@ var CustomMap = (function () {
 
   _createClass(CustomMap, [{
     key: 'link',
-    value: function link($scope, $element, $attr) {
-
-      var el = $element[0].children[0];
-      var init = function init(el) {
-        var pos = arguments.length <= 1 || arguments[1] === undefined ? { longitude: 0, latitude: 0 } : arguments[1];
-
-        var mapOptions = { center: new google.maps.LatLng(pos.latitude, pos.longitude), zoom: 12, mapTypeId: google.maps.MapTypeId.ROADMAP };
-        $scope.vm.map = new google.maps.Map(el, mapOptions);
-        console.log('map created');
-      };
-
-      if (document.readyState === "complete") init(el);else google.maps.event.addDomListener(window, 'load', init(el));
-    }
+    value: function link($scope, $element, $attr) {}
   }]);
 
   return CustomMap;
 })();
 
-exports['default'] = ['map', CustomMap];
+exports['default'] = ['customMap', CustomMap];
 module.exports = exports['default'];
 
 },{"lodash":22}],4:[function(require,module,exports){
@@ -370,22 +347,25 @@ var io = require('socket.io-client'),
     angular = require('angular'),
     name = 'app';
 
+// require('spin.js');
+// var Ladda = require('ladda');
 require('angular-socket-io');
 require('angular-ui-router');
 require('satellizer');
 require('sweetalert');
 require('angular-sweetalert');
 require('ladda-angular');
+require('ngmap');
 
 // App
-angular.module(name, ['satellizer', 'btford.socket-io', 'ui.router', 'oitozero.ngSweetAlert', 'ladda']).config(require('./config')).run(require('./global'));
+angular.module(name, ['satellizer', 'btford.socket-io', 'ui.router', 'oitozero.ngSweetAlert', 'ladda', 'ngMap']).config(require('./config')).run(require('./global'));
 
 // App Parts
 (_require$directive = (_require = require('./bootstrap')(name)).directive.apply(_require, _toConsumableArray(require('./directives/map')))).directive.apply(_require$directive, _toConsumableArray(require('./directives/nav'))).factory('socket', /*@ngInject*/["socketFactory", function (socketFactory) {
 	return socketFactory({ prefix: '', ioSocket: io.connect('http://localhost:3000/') });
 }]);
 
-},{"./bootstrap":1,"./config":2,"./directives/map":3,"./directives/nav":5,"./global":6,"angular":18,"angular-socket-io":14,"angular-sweetalert":15,"angular-ui-router":16,"ladda-angular":21,"satellizer":23,"socket.io-client":24,"sweetalert":74}],8:[function(require,module,exports){
+},{"./bootstrap":1,"./config":2,"./directives/map":3,"./directives/nav":5,"./global":6,"angular":18,"angular-socket-io":14,"angular-sweetalert":15,"angular-ui-router":16,"ladda-angular":21,"ngmap":23,"satellizer":24,"socket.io-client":25,"sweetalert":75}],8:[function(require,module,exports){
 var jade = require("jade/runtime");
 
 module.exports = function template(locals) {
@@ -423,7 +403,7 @@ var buf = [];
 var jade_mixins = {};
 var jade_interp;
 
-buf.push("<button ng-click=\"vm.report()\" ladda-button=\"vm.laddaLoading\" data-style=\"expand-right\" class=\"report-button ladda-button\">Report</button><map feed=\"vm.feed\" width=\"100%\" height=\"100%\" position=\"absolute\" center=\"vm.center\"></map>");;return buf.join("");
+buf.push("<button ng-click=\"vm.report()\" ladda-button=\"vm.laddaLoading\" data-style=\"expand-right\" class=\"report-button ladda-button\">Report</button><custom-map feed=\"vm.feed\" width=\"100%\" height=\"100%\" position=\"absolute\" center=\"vm.center\"></custom-map>");;return buf.join("");
 };
 },{"jade/runtime":20}],11:[function(require,module,exports){
 'use strict';
@@ -436,6 +416,7 @@ exports['default'] = /*@ngInject*/["$scope", "socket", "$q", "$http", "SweetAler
   var _this = this;
 
   this.feed = [];
+  // this.center = { longitude: 0, latitude: 0 }
 
   socket.emit('activity:changes:start', {});
 
@@ -46333,17 +46314,2513 @@ exports.DebugItem = function DebugItem(lineno, filename) {
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],23:[function(require,module,exports){
+angular.module('ngMap', []);
+
+/**
+ * @ngdoc service
+ * @name Attr2Options
+ * @description 
+ *   Converts tag attributes to options used by google api v3 objects, map, marker, polygon, circle, etc.
+ */
+/* global google */
+(function() {
+  'use strict';
+
+  var SPECIAL_CHARS_REGEXP = /([\:\-\_]+(.))/g;
+  var MOZ_HACK_REGEXP = /^moz([A-Z])/;  
+
+  function camelCase(name) {
+    return name.
+      replace(SPECIAL_CHARS_REGEXP, function(_, separator, letter, offset) {
+        return offset ? letter.toUpperCase() : letter;
+      }).
+      replace(MOZ_HACK_REGEXP, 'Moz$1');
+  }
+
+  function JSONize(str) {
+    try {       // if parsable already, return as it is
+      JSON.parse(str);
+      return str;
+    } catch(e) { // if not parsable, change little
+      return str
+        // wrap keys without quote with valid double quote
+        .replace(/([\$\w]+)\s*:/g, function(_, $1){return '"'+$1+'":'})
+        // replacing single quote wrapped ones to double quote 
+        .replace(/'([^']+)'/g, function(_, $1){return '"'+$1+'"'})
+    }
+  }
+
+  var Attr2Options = function($parse, $timeout, NavigatorGeolocation, GeoCoder) { 
+
+    /**
+     * Returns the attributes of an element as hash
+     * @memberof Attr2Options
+     * @param {HTMLElement} el html element
+     * @returns {Hash} attributes
+     */
+    var orgAttributes = function(el) {
+      (el.length > 0) && (el = el[0]);
+      var orgAttributes = {};
+      for (var i=0; i<el.attributes.length; i++) {
+        var attr = el.attributes[i];
+        orgAttributes[attr.name] = attr.value;
+      }
+      return orgAttributes;
+    };
+
+    var toOptionValue = function(input, options) {
+      var output, key=options.key, scope=options.scope;
+      try { // 1. Number?
+        var num = Number(input);
+        if (isNaN(num)) {
+          throw "Not a number";
+        } else  {
+          output = num;
+        }
+      } catch(err) { 
+        try { // 2.JSON?
+          if (input.match(/^[\+\-]?[0-9\.]+,[ ]*\ ?[\+\-]?[0-9\.]+$/)) { // i.e "-1.0, 89.89"
+            input = "["+input+"]";
+          }
+          output = JSON.parse(JSONize(input));
+          if (output instanceof Array) {
+            var t1stEl = output[0];
+            if (t1stEl.constructor == Object) { // [{a:1}] : not lat/lng ones
+            } else if (t1stEl.constructor == Array) { // [[1,2],[3,4]] 
+              output =  output.map(function(el) {
+                return new google.maps.LatLng(el[0], el[1]);
+              });
+            } else if(!isNaN(parseFloat(t1stEl)) && isFinite(t1stEl)) {
+              return new google.maps.LatLng(output[0], output[1]);
+            }
+          }
+        } catch(err2) {
+          // 3. Object Expression. i.e. LatLng(80,-49)
+          if (input.match(/^[A-Z][a-zA-Z0-9]+\(.*\)$/)) {
+            try {
+              var exp = "new google.maps."+input;
+              output = eval(exp); // TODO, still eval
+            } catch(e) {
+              output = input;
+            } 
+          // 4. Object Expression. i.e. MayTypeId.HYBRID 
+          } else if (input.match(/^([A-Z][a-zA-Z0-9]+)\.([A-Z]+)$/)) {
+            try {
+              var matches = input.match(/^([A-Z][a-zA-Z0-9]+)\.([A-Z]+)$/);
+              output = google.maps[matches[1]][matches[2]];
+            } catch(e) {
+              output = input;
+            } 
+          // 5. Object Expression. i.e. HYBRID 
+          } else if (input.match(/^[A-Z]+$/)) {
+            try {
+              var capitalizedKey = key.charAt(0).toUpperCase() + key.slice(1);
+              if (key.match(/temperatureUnit|windSpeedUnit|labelColor/)) {
+                capitalizedKey = capitalizedKey.replace(/s$/,"");
+                output = google.maps.weather[capitalizedKey][input];
+              } else {
+                output = google.maps[capitalizedKey][input];
+              }
+            } catch(e) {
+              output = input;
+            }
+          } else {
+            output = input;
+          }
+        } // catch(err2)
+      } // catch(err)
+      return output;
+    };
+
+    var getAttrsToObserve = function(attrs) {
+      var attrsToObserve = [];
+      if (attrs["ng-repeat"] || attrs.ngRepeat) {  // if element is created by ng-repeat, don't observe any
+        void(0);
+      } else {
+        for (var attrName in attrs) {
+          var attrValue = attrs[attrName];
+          if (attrValue && attrValue.match(/\{\{.*\}\}/)) { // if attr value is {{..}}
+            void 0;
+            attrsToObserve.push(camelCase(attrName));
+          }
+        }
+      }
+      return attrsToObserve;
+    };
+
+    /**
+     * filters attributes by skipping angularjs methods $.. $$..
+     * @memberof Attr2Options
+     * @param {Hash} attrs tag attributes
+     * @returns {Hash} filterd attributes
+     */
+    var filter = function(attrs) {
+      var options = {};
+      for(var key in attrs) {
+        if (key.match(/^\$/) || key.match(/^ng[A-Z]/)) {
+          void(0);
+        } else {
+          options[key] = attrs[key];
+        }
+      }
+      return options;
+    };
+
+    /**
+     * converts attributes hash to Google Maps API v3 options  
+     * ```
+     *  . converts numbers to number   
+     *  . converts class-like string to google maps instance   
+     *    i.e. `LatLng(1,1)` to `new google.maps.LatLng(1,1)`  
+     *  . converts constant-like string to google maps constant    
+     *    i.e. `MapTypeId.HYBRID` to `google.maps.MapTypeId.HYBRID`   
+     *    i.e. `HYBRID"` to `google.maps.MapTypeId.HYBRID`  
+     * ```
+     * @memberof Attr2Options
+     * @param {Hash} attrs tag attributes
+     * @param {scope} scope angularjs scope
+     * @returns {Hash} options converted attributess
+     */
+    var getOptions = function(attrs, scope) {
+      var options = {};
+      for(var key in attrs) {
+        if (attrs[key]) {
+          if (key.match(/^on[A-Z]/)) { //skip events, i.e. on-click
+            continue;
+          } else if (key.match(/ControlOptions$/)) { // skip controlOptions
+            continue;
+          } else {
+            options[key] = toOptionValue(attrs[key], {scope:scope, key: key});
+          }
+        } // if (attrs[key])
+      } // for(var key in attrs)
+      return options;
+    };
+
+    /**
+     * converts attributes hash to scope-specific event function 
+     * @memberof Attr2Options
+     * @param {scope} scope angularjs scope
+     * @param {Hash} attrs tag attributes
+     * @returns {Hash} events converted events
+     */
+    var getEvents = function(scope, attrs) {
+      var events = {};
+      var toLowercaseFunc = function($1){
+        return "_"+$1.toLowerCase();
+      };
+      var eventFunc = function(attrValue) {
+        var matches = attrValue.match(/([^\(]+)\(([^\)]*)\)/);
+        var funcName = matches[1];
+        var argsStr = matches[2].replace(/event[ ,]*/,'');  //remove string 'event'
+        var argsExpr = $parse("["+argsStr+"]"); //for perf when triggering event
+        return function(event) {
+          var args = argsExpr(scope); //get args here to pass updated model values
+          function index(obj,i) {return obj[i];}
+          var f = funcName.split('.').reduce(index, scope);
+          f && f.apply(this, [event].concat(args));
+          $timeout( function() {
+            scope.$apply();
+          });
+        };
+      };
+
+      for(var key in attrs) {
+        if (attrs[key]) {
+          if (!key.match(/^on[A-Z]/)) { //skip if not events
+            continue;
+          }
+          
+          //get event name as underscored. i.e. zoom_changed
+          var eventName = key.replace(/^on/,'');
+          eventName = eventName.charAt(0).toLowerCase() + eventName.slice(1);
+          eventName = eventName.replace(/([A-Z])/g, toLowercaseFunc);
+
+          var attrValue = attrs[key];
+          events[eventName] = new eventFunc(attrValue);
+        }
+      }
+      return events;
+    };
+
+    /**
+     * control means map controls, i.e streetview, pan, etc, not a general control
+     * @memberof Attr2Options
+     * @param {Hash} filtered filtered tag attributes
+     * @returns {Hash} Google Map options
+     */
+    var getControlOptions = function(filtered) {
+      var controlOptions = {};
+      if (typeof filtered != 'object') {
+        return false;
+      }
+
+      for (var attr in filtered) {
+        if (filtered[attr]) {
+          if (!attr.match(/(.*)ControlOptions$/)) { 
+            continue; // if not controlOptions, skip it
+          }
+
+          //change invalid json to valid one, i.e. {foo:1} to {"foo": 1}
+          var orgValue = filtered[attr];
+          var newValue = orgValue.replace(/'/g, '"');
+          newValue = newValue.replace(/([^"]+)|("[^"]+")/g, function($0, $1, $2) {
+            if ($1) {
+              return $1.replace(/([a-zA-Z0-9]+?):/g, '"$1":');
+            } else {
+              return $2; 
+            } 
+          });
+          try {
+            var options = JSON.parse(newValue);
+            for (var key in options) { //assign the right values
+              if (options[key]) {
+                var value = options[key];
+                if (typeof value === 'string') {
+                  value = value.toUpperCase();
+                } else if (key === "mapTypeIds") {
+                  value = value.map( function(str) {
+                    if (str.match(/^[A-Z]+$/)) { // if constant
+                      return google.maps.MapTypeId[str.toUpperCase()];
+                    } else { // else, custom map-type
+                      return str;
+                    }
+                  });
+                } 
+                
+                if (key === "style") {
+                  var str = attr.charAt(0).toUpperCase() + attr.slice(1);
+                  var objName = str.replace(/Options$/,'')+"Style";
+                  options[key] = google.maps[objName][value];
+                } else if (key === "position") {
+                  options[key] = google.maps.ControlPosition[value];
+                } else {
+                  options[key] = value;
+                }
+              }
+            }
+            controlOptions[attr] = options;
+          } catch (e) {
+            void 0;
+          }
+        }
+      } // for
+
+      return controlOptions;
+    };
+
+    return {
+      camelCase: camelCase,
+      filter: filter,
+      getOptions: getOptions,
+      getEvents: getEvents,
+      getControlOptions: getControlOptions,
+      toOptionValue: toOptionValue,
+      getAttrsToObserve: getAttrsToObserve,
+      orgAttributes: orgAttributes
+    }; // return
+
+  }; 
+  Attr2Options.$inject= ['$parse', '$timeout', 'NavigatorGeolocation', 'GeoCoder'];
+
+  angular.module('ngMap').service('Attr2Options', Attr2Options);
+})();
+
+/**
+ * @ngdoc service
+ * @name GeoCoder
+ * @description
+ *   Provides [defered/promise API](https://docs.angularjs.org/api/ng/service/$q) service for Google Geocoder service
+ */
+/* global google */
+(function() {
+  'use strict';
+  var GeoCoder = function($q) {
+    return {
+      /**
+       * @memberof GeoCoder
+       * @param {Hash} options https://developers.google.com/maps/documentation/geocoding/#geocoding
+       * @example
+       * ```
+       *   GeoCoder.geocode({address: 'the cn tower'}).then(function(result) {
+       *     //... do something with result
+       *   });
+       * ```
+       * @returns {HttpPromise} Future object
+       */
+      geocode : function(options) {
+        var deferred = $q.defer();
+        var geocoder = new google.maps.Geocoder();
+        geocoder.geocode(options, function (results, status) {
+          if (status == google.maps.GeocoderStatus.OK) {
+            deferred.resolve(results);
+          } else {
+            deferred.reject('Geocoder failed due to: '+ status);
+          }
+        });
+        return deferred.promise;
+      }
+    }
+  };
+  GeoCoder.$inject = ['$q'];
+
+  angular.module('ngMap').service('GeoCoder', GeoCoder);
+})();
+
+/**
+ * @ngdoc service
+ * @name NavigatorGeolocation
+ * @description
+ *  Provides [defered/promise API](https://docs.angularjs.org/api/ng/service/$q) service for navigator.geolocation methods
+ */
+/* global google */
+(function() {
+  'use strict';
+
+  var NavigatorGeolocation = function($q) {
+    return {
+      /**
+       * @memberof NavigatorGeolocation
+       * @param {function} success success callback function
+       * @param {function} failure failure callback function
+       * @example
+       * ```
+       *  NavigatorGeolocation.getCurrentPosition()
+       *    .then(function(position) {
+       *      var lat = position.coords.latitude, lng = position.coords.longitude;
+       *      .. do something lat and lng
+       *    });
+       * ```
+       * @returns {HttpPromise} Future object
+       */
+      getCurrentPosition: function() {
+        var deferred = $q.defer();
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            function(position) {
+              deferred.resolve(position);
+            }, function(evt) {
+              void 0;
+              deferred.reject(evt);
+            }
+          );
+        } else {
+          deferred.reject("Browser Geolocation service failed.");
+        }
+        return deferred.promise;
+      },
+
+      watchPosition: function() {
+        return "TODO";
+      },
+
+      clearWatch: function() {
+        return "TODO";
+      }
+    };
+  }; 
+  NavigatorGeolocation.$inject = ['$q'];
+
+  angular.module('ngMap').service('NavigatorGeolocation', NavigatorGeolocation);
+})();
+
+/**
+ * @ngdoc service
+ * @name StreetView
+ * @description
+ *  Provides [defered/promise API](https://docs.angularjs.org/api/ng/service/$q) service 
+ *  for [Google StreetViewService](https://developers.google.com/maps/documentation/javascript/streetview)
+ */
+/* global google */
+(function() {
+  'use strict';
+
+  var StreetView = function($q) {
+
+    /**
+     * Retrieves panorama id from the given map (and or position)
+     * @memberof StreetView
+     * @param {map} map Google map instance
+     * @param {LatLng} latlng Google LatLng instance  
+     *   default: the center of the map
+     * @example
+     *   StreetView.getPanorama(map).then(function(panoId) {
+     *     $scope.panoId = panoId;
+     *   });
+     * @returns {HttpPromise} Future object
+     */
+    var getPanorama = function(map, latlng) {
+      latlng = latlng || map.getCenter();
+      var deferred = $q.defer();
+      var svs = new google.maps.StreetViewService();
+      svs.getPanoramaByLocation( (latlng||map.getCenter), 100, function (data, status) {
+        // if streetView available
+        if (status === google.maps.StreetViewStatus.OK) {
+          deferred.resolve(data.location.pano);
+        } else {
+          // no street view available in this range, or some error occurred
+          deferred.resolve(false);
+          //deferred.reject('Geocoder failed due to: '+ status);
+        }
+      });
+      return deferred.promise;
+    };
+
+    /**
+     * Set panorama view on the given map with the panorama id
+     * @memberof StreetView
+     * @param {map} map Google map instance
+     * @param {String} panoId Panorama id fro getPanorama method
+     * @example
+     *   StreetView.setPanorama(map, panoId);
+     */
+    var setPanorama = function(map, panoId) {
+      var svp = new google.maps.StreetViewPanorama(map.getDiv(), {enableCloseButton: true});
+      svp.setPano(panoId);
+    };
+
+    return {
+      getPanorama: getPanorama,
+      setPanorama: setPanorama
+    }; // return
+
+  };
+  StreetView.$inject = ['$q'];
+
+  angular.module('ngMap').service('StreetView', StreetView);
+})();
+
+/**
+ * @ngdoc directive
+ * @name bicycling-layer
+ * @requires Attr2Options 
+ * @description 
+ *   Requires:  map directive
+ *   Restrict To:  Element
+ *
+ * @example
+ * Example: 
+ *
+ *   <map zoom="13" center="34.04924594193164, -118.24104309082031">
+ *     <bicycling-layer></bicycling-layer>
+ *    </map>
+ */
+(function() {
+  'use strict';
+  angular.module('ngMap').directive('bicyclingLayer', ['Attr2Options', function(Attr2Options) {
+    var parser = Attr2Options;
+    
+    var getLayer = function(options, events) {
+      var layer = new google.maps.BicyclingLayer(options);
+      for (var eventName in events) {
+        google.maps.event.addListener(layer, eventName, events[eventName]);
+      }
+      return layer;
+    };
+    
+    return {
+      restrict: 'E',
+      require: '^map',
+
+      link: function(scope, element, attrs, mapController) {
+        var orgAttrs = parser.orgAttributes(element);
+        var filtered = parser.filter(attrs);
+        var options = parser.getOptions(filtered);
+        var events = parser.getEvents(scope, filtered);
+
+        void 0;
+
+        var layer = getLayer(options, events);
+        mapController.addObject('bicyclingLayers', layer);
+        mapController.observeAttrSetObj(orgAttrs, attrs, layer);  //observers
+        element.bind('$destroy', function() {
+          mapController.deleteObject('bicyclingLayers', layer);
+        });
+      }
+     }; // return
+  }]);
+})();
+
+/**
+ * @ngdoc directive
+ * @name cloud-layer
+ * @requires Attr2Options 
+ * @description 
+ *   Requires:  map directive
+ *   Restrict To:  Element
+ *
+ * @example
+ * Example: 
+ *
+ *   <map zoom="13" center="34.04924594193164, -118.24104309082031">
+ *     <cloud-layer></cloud-layer>
+ *    </map>
+ */
+(function() {
+  'use strict';
+  angular.module('ngMap').directive('cloudLayer', ['Attr2Options', function(Attr2Options) {
+    var parser = Attr2Options;
+    
+    var getLayer = function(options, events) {
+      var layer = new google.maps.weather.CloudLayer(options);
+      for (var eventName in events) {
+        google.maps.event.addListener(layer, eventName, events[eventName]);
+      }
+      return layer;
+    };
+    
+    return {
+      restrict: 'E',
+      require: '^map',
+
+      link: function(scope, element, attrs, mapController) {
+        var orgAttrs = parser.orgAttributes(element);
+        var filtered = parser.filter(attrs);
+        var options = parser.getOptions(filtered);
+        var events = parser.getEvents(scope, filtered);
+        void 0;
+
+        var layer = getLayer(options, events);
+        mapController.addObject('cloudLayers', layer);
+        mapController.observeAttrSetObj(orgAttrs, attrs, layer);  //observers
+        element.bind('$destroy', function() {
+          mapController.deleteObject('cloudLayers', layer);
+        });
+      }
+     }; // return
+  }]);
+})();
+
+/**
+ * @ngdoc directive
+ * @name custom-control
+ * @requires Attr2Options 
+ * @requires $compile
+ * @description 
+ *   Build custom control and set to the map with position
+ *   
+ *   Requires:  map directive
+ *
+ *   Restrict To:  Element
+ *
+ * @param {String} position position of this control
+ *        i.e. TOP_RIGHT
+ * @param {Number} index index of the control
+ * @example
+ *
+ * Example: 
+ *  <map center="41.850033,-87.6500523" zoom="3">
+ *    <custom-control id="home" position="TOP_LEFT" index="1">
+ *      <div style="background-color: white;">
+ *        <b>Home</b>
+ *      </div>
+ *    </custom-control>
+ *  </map>
+ *
+ */
+(function() {
+  'use strict';
+  angular.module('ngMap').directive('customControl', ['Attr2Options', '$compile', function(Attr2Options, $compile)  {
+    'use strict';
+    var parser = Attr2Options;
+
+    return {
+      restrict: 'E',
+      require: '^map',
+      link: function(scope, element, attrs, mapController) {
+        var orgAttrs = parser.orgAttributes(element);
+        var filtered = parser.filter(attrs);
+        var options = parser.getOptions(filtered, scope);
+        var events = parser.getEvents(scope, filtered);
+        void 0;
+
+        /**
+         * build a custom control element
+         */
+        var customControlEl = element[0].parentElement.removeChild(element[0]);
+        $compile(customControlEl.innerHTML.trim())(scope);
+
+        /**
+         * set events
+         */
+        for (var eventName in events) {
+          google.maps.event.addDomListener(customControlEl, eventName, events[eventName]);
+        }
+
+        mapController.addObject('customControls', customControlEl);
+        scope.$on('mapInitialized', function(evt, map) {
+          var position = options.position;
+          map.controls[google.maps.ControlPosition[position]].push(customControlEl);
+        });
+
+      } //link
+    }; // return
+  }]);// function
+})();
+
+/**
+ * @ngdoc directive
+ * @name directions
+ * @description 
+ *   Enable directions on map. e.g., origin, destination, draggable, waypoints, etc
+ *   
+ *   Requires:  map directive
+ *
+ *   Restrict To:  Element 
+ *
+ * @param {String} &lt;DirectionsRendererOptions> Any DirectionsRendererOptions, 
+ *   https://developers.google.com/maps/documentation/javascript/reference#DirectionsRendererOptions
+ * @param {String} &lt;DirectionsRequest Options> Any DirectionsRequest options, 
+ *   https://developers.google.com/maps/documentation/javascript/reference#DirectionsRequest
+ * @example
+ * Example: 
+ *   <map zoom="14" center="37.7699298, -122.4469157">
+ *     <directions 
+ *       draggable="true"
+ *       panel="directions-panel"
+ *       travel-mode="{{travelMode}}"
+ *       waypoints="[{location:'kingston', stopover:true}]"
+ *       origin="{{origin}}"
+ *       destination="{{destination}}">
+ *     </directions>
+ *   </map> 
+ */
+/* global google */
+(function() {
+  'use strict';
+
+  var getDirectionsRenderer = function(options, events) {
+    if (options.panel) {
+      options.panel = document.getElementById(options.panel) || document.querySelector(options.panel);
+    }
+    var renderer = new google.maps.DirectionsRenderer(options);
+    for (var eventName in events) {
+      google.maps.event.addListener(renderer, eventName, events[eventName]);
+    }
+    return renderer;
+  };
+
+  var directions = function(Attr2Options, $timeout) {
+    var parser = Attr2Options;
+    var directionsService = new google.maps.DirectionsService();
+
+    var updateRoute = function(renderer, options) {
+      /* filter out valid keys only for DirectionsRequest object*/
+      var request = options;
+      request.travelMode = request.travelMode || 'DRIVING';
+      var validKeys = [
+        'origin', 'destination', 'travelMode', 'transitOptions', 'unitSystem',
+        'durationInTraffic', 'waypoints', 'optimizeWaypoints', 
+        'provideRouteAlternatives', 'avoidHighways', 'avoidTolls', 'region'
+      ];
+      for(var key in request){
+        (validKeys.indexOf(key) === -1) && (delete request[key]);
+      }
+
+      if (request.origin && request.destination) {
+        void 0;
+        directionsService.route(request, function(response, status) {
+          if (status == google.maps.DirectionsStatus.OK) {
+            $timeout(function() {
+              renderer.setDirections(response);
+            });
+          }
+        });
+      } 
+    };
+
+    var linkFunc = function(scope, element, attrs, mapController) {
+      var orgAttrs = parser.orgAttributes(element);
+      var filtered = parser.filter(attrs);
+      var options = parser.getOptions(filtered);
+      var events = parser.getEvents(scope, filtered);
+      var attrsToObserve = parser.getAttrsToObserve(orgAttrs);
+
+      var renderer = getDirectionsRenderer(options, events);
+      mapController.addObject('directionsRenderers', renderer);
+      
+      attrsToObserve.forEach(function(attrName) {
+        (function(attrName) {
+          attrs.$observe(attrName, function(val) {
+            if (options[attrName] !== val) { //apply only if changed
+              var optionValue = parser.toOptionValue(val, {key: attrName});
+              void 0;
+              options[attrName] = optionValue;
+              updateRoute(renderer, options);
+            }
+          });
+        })(attrName);
+      });
+
+      scope.$on('mapInitialized', function(event, map) {
+        updateRoute(renderer, options);
+      });
+      scope.$on('$destroy', function(event, map) {
+        mapController.deleteObject('directionsRenderers', renderer);
+      });
+    };
+    
+    return {
+      restrict: 'E',
+      require: '^map',
+      link: linkFunc
+    }
+  }; // var directions
+  directions.$inject = ['Attr2Options', '$timeout'];
+
+  angular.module('ngMap').directive('directions', directions);
+})();
+
+
+/**
+ * @ngdoc directive
+ * @name drawing-manager
+ * @requires Attr2Options
+ * @description
+ *   Requires:  map directive
+ *   Restrict To:  Element
+ *
+ * @example
+ * Example:
+ *
+ *  <map zoom="13" center="37.774546, -122.433523" map-type-id="SATELLITE">
+ *    <drawing-manager  on-overlaycomplete="onMapOverlayCompleted()" position="ControlPosition.TOP_CENTER" drawingModes="POLYGON,CIRCLE" drawingControl="true" circleOptions="fillColor: '#FFFF00';fillOpacity: 1;strokeWeight: 5;clickable: false;zIndex: 1;editable: true;" ></drawing-manager>
+ *  </map>
+ *
+ *  TODO: Add remove button.
+ *  currently, for out solution, we have the shapes/markers in our own controller, and we use some css classes to change the shape button
+ *  to a remove button (<div>X</div>) and have the remove operation in our own controller.
+ */
+(function() {
+  'use strict';
+  angular.module('ngMap').directive('drawingManager', ['Attr2Options', function(Attr2Options) {
+    var parser = Attr2Options;
+
+    return {
+      restrict: 'E',
+      require: '^map',
+
+      link: function(scope, element, attrs, mapController) {
+        var orgAttrs = parser.orgAttributes(element);
+        var filtered = parser.filter(attrs);
+        var options = parser.getOptions(filtered);
+        var controlOptions = parser.getControlOptions(filtered);
+        var events = parser.getEvents(scope, filtered);
+
+        void 0;
+
+        /**
+         * set options
+         */
+        var drawingManager = new google.maps.drawing.DrawingManager({
+          drawingMode: options.drawingmode,
+          drawingControl: options.drawingcontrol,
+          drawingControlOptions: controlOptions.drawingControlOptions,
+          circleOptions:options.circleoptions,
+          markerOptions:options.markeroptions,
+          polygonOptions:options.polygonoptions,
+          polylineOptions:options.polylineoptions,
+          rectangleOptions:options.rectangleoptions
+        });
+
+
+        /**
+         * set events
+         */
+        var events = parser.getEvents(scope, filtered);
+        for (var eventName in events) {
+          google.maps.event.addListener(drawingManager, eventName, events[eventName]);
+        }
+
+        mapController.addObject('mapDrawingManager', drawingManager);
+      }
+    }; // return
+  }]);
+})();
+
+/**
+ * @ngdoc directive
+ * @name dynamic-maps-engine-layer
+ * @description 
+ *   Requires:  map directive
+ *   Restrict To:  Element
+ *
+ * @example
+ * Example: 
+ *   <map zoom="14" center="[59.322506, 18.010025]">
+ *     <dynamic-maps-engine-layer layer-id="06673056454046135537-08896501997766553811"></dynamic-maps-engine-layer>
+ *    </map>
+ */
+(function() {
+  'use strict';
+
+  angular.module('ngMap').directive('dynamicMapsEngineLayer', ['Attr2Options', function(Attr2Options) {
+    var parser = Attr2Options;
+
+    var getDynamicMapsEngineLayer = function(options, events) {
+      var layer = new google.maps.visualization.DynamicMapsEngineLayer(options);
+
+      for (var eventName in events) {
+        google.maps.event.addListener(layer, eventName, events[eventName]);
+      }
+
+      return layer;
+    };
+
+    
+    return {
+      restrict: 'E',
+      require: '^map',
+
+      link: function(scope, element, attrs, mapController) {
+        var filtered = parser.filter(attrs);
+        var options = parser.getOptions(filtered);
+        var events = parser.getEvents(scope, filtered, events);
+        void 0;
+
+        var layer = getDynamicMapsEngineLayer(options, events);
+        mapController.addObject('mapsEngineLayers', layer);
+      }
+     }; // return
+  }]);
+})();
+
+/**
+ * @ngdoc directive
+ * @name fusion-tables-layer
+ * @description 
+ *   Requires:  map directive
+ *   Restrict To:  Element
+ *
+ * @example
+ * Example: 
+ *   <map zoom="11" center="41.850033, -87.6500523">
+ *     <fusion-tables-layer query="{
+ *       select: 'Geocodable address',
+ *       from: '1mZ53Z70NsChnBMm-qEYmSDOvLXgrreLTkQUvvg'}">
+ *     </fusion-tables-layer>
+ *   </map>
+ */
+(function() {
+  'use strict';
+
+  angular.module('ngMap').directive('fusionTablesLayer', ['Attr2Options', function(Attr2Options) {
+    var parser = Attr2Options;
+
+    var getLayer = function(options, events) {
+      var layer = new google.maps.FusionTablesLayer(options);
+
+      for (var eventName in events) {
+        google.maps.event.addListener(layer, eventName, events[eventName]);
+      }
+
+      return layer;
+    };
+
+    
+    return {
+      restrict: 'E',
+      require: '^map',
+
+      link: function(scope, element, attrs, mapController) {
+        var filtered = parser.filter(attrs);
+        var options = parser.getOptions(filtered);
+        var events = parser.getEvents(scope, filtered, events);
+        void 0;
+
+        var layer = getLayer(options, events);
+        mapController.addObject('fusionTablesLayers', layer);
+      }
+     }; // return
+  }]);
+})();
+
+/**
+ * @ngdoc directive
+ * @name heatmap-layer
+ * @requires Attr2Options 
+ * @description 
+ *   Requires:  map directive
+ *   Restrict To:  Element
+ *
+ * @example
+ * Example: 
+ *
+ *   <map zoom="11" center="[41.875696,-87.624207]">
+ *     <heatmap-layer data="taxiData"></heatmap-layer>
+ *   </map>
+ */
+(function() {
+  'use strict';
+
+  angular.module('ngMap').directive('heatmapLayer', ['Attr2Options', '$window', function(Attr2Options, $window) {
+    var parser = Attr2Options;
+    
+    return {
+      restrict: 'E',
+      require: '^map',
+
+      link: function(scope, element, attrs, mapController) {
+        var filtered = parser.filter(attrs);
+
+        /**
+         * set options 
+         */
+        var options = parser.getOptions(filtered);
+        options.data = $window[attrs.data] || scope[attrs.data];
+        if (options.data instanceof Array) {
+          options.data = new google.maps.MVCArray(options.data);
+        } else {
+          throw "invalid heatmap data";
+        }
+        var layer = new google.maps.visualization.HeatmapLayer(options);
+
+        /**
+         * set events 
+         */
+        var events = parser.getEvents(scope, filtered);
+        void 0;
+
+        mapController.addObject('heatmapLayers', layer);
+      }
+     }; // return
+  }]);
+})();
+
+/**
+ * @ngdoc directive
+ * @name info-window
+ * @requires Attr2Options
+ * @requires $compile
+ * @description
+ *   Defines infoWindow and provides compile method
+ *
+ *   Requires:  map directive
+ *
+ *   Restrict To:  Element
+ *
+ * @param {Boolean} visible Indicates to show it when map is initialized
+ * @param {Boolean} visible-on-marker Indicates to show it on a marker when map is initialized
+ * @param {Expression} geo-callback if position is an address, the expression is will be performed when geo-lookup is successful. e.g., geo-callback="showDetail()"
+ * @param {String} &lt;InfoWindowOption> Any InfoWindow options,
+ *        https://developers.google.com/maps/documentation/javascript/reference?csw=1#InfoWindowOptions
+ * @param {String} &lt;InfoWindowEvent> Any InfoWindow events, https://developers.google.com/maps/documentation/javascript/reference
+ * @example
+ * Usage:
+ *   <map MAP_ATTRIBUTES>
+ *    <info-window id="foo" ANY_OPTIONS ANY_EVENTS"></info-window>
+ *   </map>
+ *
+ * Example:
+ *  <map center="41.850033,-87.6500523" zoom="3">
+ *    <info-window id="1" position="41.850033,-87.6500523" >
+ *      <div ng-non-bindable>
+ *        Chicago, IL<br/>
+ *        LatLng: {{chicago.lat()}}, {{chicago.lng()}}, <br/>
+ *        World Coordinate: {{worldCoordinate.x}}, {{worldCoordinate.y}}, <br/>
+ *        Pixel Coordinate: {{pixelCoordinate.x}}, {{pixelCoordinate.y}}, <br/>
+ *        Tile Coordinate: {{tileCoordinate.x}}, {{tileCoordinate.y}} at Zoom Level {{map.getZoom()}}
+ *      </div>
+ *    </info-window>
+ *  </map>
+ */
+/* global google */
+(function() {
+  'use strict';
+
+  var infoWindow = function(Attr2Options, $compile, $timeout, $parse)  {
+    var parser = Attr2Options;
+
+    var getInfoWindow = function(options, events, element) {
+      var infoWindow;
+
+      /**
+       * set options
+       */
+      if (options.position && !(options.position instanceof google.maps.LatLng)) {
+        delete options.position;
+      }
+      infoWindow = new google.maps.InfoWindow(options);
+
+      /**
+       * set events
+       */
+      if (Object.keys(events).length > 0) {
+        void 0;
+      }
+      for (var eventName in events) {
+        if (eventName) {
+          google.maps.event.addListener(infoWindow, eventName, events[eventName]);
+        }
+      }
+
+      /**
+       * set template ane template-relate functions
+       * it must have a container element with ng-non-bindable
+       */
+      var template = element.html().trim();
+      if (angular.element(template).length != 1) {
+        throw "info-window working as a template must have a container";
+      }
+      infoWindow.__template = template.replace(/\s?ng-non-bindable[='"]+/,"");
+
+      infoWindow.__compile = function(scope, anchor) {
+        anchor && (scope['this'] = anchor);
+        var el = $compile(infoWindow.__template)(scope);
+        infoWindow.setContent(el[0]);
+        scope.$apply();
+      };
+
+      infoWindow.__open = function(map, scope, anchor) {
+        $timeout(function() {
+          infoWindow.__compile(scope, anchor);
+          if (anchor && anchor.getPosition) {
+            infoWindow.open(map, anchor);
+          } else if (anchor && anchor instanceof google.maps.LatLng) {
+            infoWindow.open(map);
+            infoWindow.setPosition(anchor);
+          } else {
+            infoWindow.open(map);
+          }
+        });
+      };
+
+      return infoWindow;
+    };
+
+    var linkFunc = function(scope, element, attrs, mapController) {
+      element.css('display','none');
+      var orgAttrs = parser.orgAttributes(element);
+      var filtered = parser.filter(attrs);
+      var options = parser.getOptions(filtered, scope);
+      var events = parser.getEvents(scope, filtered);
+      void 0;
+
+      var address;
+      if (options.position && !(options.position instanceof google.maps.LatLng)) {
+        address = options.position;
+      }
+      var infoWindow = getInfoWindow(options, events, element);
+      if (address) {
+        mapController.getGeoLocation(address).then(function(latlng) {
+          infoWindow.setPosition(latlng);
+          infoWindow.__open(mapController.map, scope, latlng);
+          var geoCallback = attrs.geoCallback;
+          geoCallback && $parse(geoCallback)(scope);
+        });
+      }
+
+      mapController.addObject('infoWindows', infoWindow);
+      mapController.observeAttrSetObj(orgAttrs, attrs, infoWindow); /* observers */
+
+      scope.$on('mapInitialized', function(evt, map) {
+        infoWindow.visible && infoWindow.__open(map, scope);
+        if (infoWindow.visibleOnMarker) {
+          var markerId = infoWindow.visibleOnMarker;
+          infoWindow.__open(map, scope, map.markers[markerId]);
+        }
+      });
+
+      /**
+       * provide showInfoWindow method to scope
+       */
+
+      scope.showInfoWindow  = function(e, id, marker) {
+        var infoWindow = mapController.map.infoWindows[id];
+        var anchor = marker ? marker : (this.getPosition ? this : null);
+        infoWindow.__open(mapController.map, scope, anchor);
+      };
+
+      /**
+       * provide hideInfoWindow method to scope
+       */
+      scope.hideInfoWindow  = scope.hideInfoWindow ||
+        function(event, id) {
+          var infoWindow = mapController.map.infoWindows[id];
+          infoWindow.close();
+        };
+
+    }; //link
+
+    return {
+      restrict: 'E',
+      require: '^map',
+      link: linkFunc
+    };
+
+  }; // infoWindow
+  infoWindow.$inject = ['Attr2Options', '$compile', '$timeout', '$parse'];
+
+  angular.module('ngMap').directive('infoWindow', infoWindow);
+})();
+
+/**
+ * @ngdoc directive
+ * @name kml-layer
+ * @requires Attr2Options 
+ * @description 
+ *   renders Kml layer on a map
+ *   Requires:  map directive
+ *   Restrict To:  Element
+ *
+ * @param {Url} url url of the kml layer
+ * @param {KmlLayerOptions} KmlLayerOptions
+ *   (https://developers.google.com/maps/documentation/javascript/reference#KmlLayerOptions)  
+ * @param {String} &lt;KmlLayerEvent> Any KmlLayer events, https://developers.google.com/maps/documentation/javascript/reference
+ * @example
+ * Usage: 
+ *   <map MAP_ATTRIBUTES>
+ *    <kml-layer ANY_KML_LAYER ANY_KML_LAYER_EVENTS"></kml-layer>
+ *   </map>
+ *
+ * Example: 
+ *
+ *   <map zoom="11" center="[41.875696,-87.624207]">
+ *     <kml-layer url="https://gmaps-samples.googlecode.com/svn/trunk/ggeoxml/cta.kml" ></kml-layer>
+ *    </map>
+ */
+(function() {
+  'use strict';
+
+  angular.module('ngMap').directive('kmlLayer', ['Attr2Options', function(Attr2Options) {
+    var parser = Attr2Options;
+    
+    var getKmlLayer = function(options, events) {
+      var kmlLayer = new google.maps.KmlLayer(options);
+      for (var eventName in events) {
+        google.maps.event.addListener(kmlLayer, eventName, events[eventName]);
+      }
+      return kmlLayer;
+    };
+    
+    return {
+      restrict: 'E',
+      require: '^map',
+
+      link: function(scope, element, attrs, mapController) {
+        var orgAttrs = parser.orgAttributes(element);
+        var filtered = parser.filter(attrs);
+        var options = parser.getOptions(filtered);
+        var events = parser.getEvents(scope, filtered);
+        void 0;
+
+        var kmlLayer = getKmlLayer(options, events);
+        mapController.addObject('kmlLayers', kmlLayer);
+        mapController.observeAttrSetObj(orgAttrs, attrs, kmlLayer);  //observers
+        element.bind('$destroy', function() {
+          mapController.deleteObject('kmlLayers', kmlLayer);
+        });
+      }
+     }; // return
+  }]);
+})();
+
+/**
+ * @ngdoc directive
+ * @name map-data
+ * @description 
+ *   set map data
+ *   Requires:  map directive
+ *   Restrict To:  Element
+ *
+ * @param {String} method-name, run map.data[method-name] with attribute value
+ * @example
+ * Example: 
+ *
+ *   <map zoom="11" center="[41.875696,-87.624207]">
+ *     <map-data load-geo-json="https://storage.googleapis.com/maps-devrel/google.json"></map-data>
+ *    </map>
+ */
+(function() {
+  'use strict';
+
+  angular.module('ngMap').directive('mapData', ['Attr2Options', function(Attr2Options) {
+    var parser = Attr2Options;
+    
+    return {
+      restrict: 'E',
+      require: '^map',
+
+      link: function(scope, element, attrs, mapController) {
+        var filtered = parser.filter(attrs);
+        var options = parser.getOptions(filtered);
+        var events = parser.getEvents(scope, filtered, events);
+
+        void 0;
+        scope.$on('mapInitialized', function(event, map) {
+          /**
+           * options
+           */
+          for (var key in options) {
+            if (key) {
+              var val = options[key];
+              if (typeof scope[val] === "function") {
+                map.data[key](scope[val]);
+              } else {
+                map.data[key](val);
+              }
+            } // if (key)
+          }
+
+          /**
+           * events
+           */
+          for (var eventName in events) {
+            if (events[eventName]) {
+              map.data.addListener(eventName, events[eventName]);
+            }
+          }
+        });
+      }
+     }; // return
+  }]);
+})();
+
+/**
+ * @ngdoc directive
+ * @name lazy-load
+ * @requires Attr2Options 
+ * @description 
+ *   Requires: Delay the initialization of directive until required .js loads
+ *   Restrict To: Attribute 
+ *
+ * @param {String} lazy-load
+      script source file location
+ *    example:  
+ *      'http://maps.googlecom/maps/api/js'   
+
+ * @example
+ * Example: 
+ *
+ *   <div map-lazy-load="http://maps.google.com/maps/api/js">
+ *     <map center="Brampton" zoom="10">
+ *       <marker position="Brampton"></marker>
+ *     </map>
+ *   </div>
+ */
+(function() {
+  'use strict';
+  var $timeout, $compile, src, savedHtml;
+
+  var preLinkFunc = function(scope, element, attrs) {
+    window.lazyLoadCallback = function() {
+      void 0;
+      $timeout(function() { /* give some time to load */
+        element.html(savedHtml);
+        $compile(element.contents())(scope);
+      }, 100);
+    };
+
+    if(window.google === undefined || window.google.maps === undefined) {
+      var scriptEl = document.createElement('script');
+      scriptEl.src = src + (src.indexOf('?') > -1 ? '&' : '?') + 'callback=lazyLoadCallback';
+      document.body.appendChild(scriptEl);
+    } else {
+      element.html(savedHtml);
+      $compile(element.contents())(scope);
+    }
+  };
+
+  var compileFunc = function(tElement, tAttrs) {
+
+    (!tAttrs.mapLazyLoad) && void 0;
+    savedHtml = tElement.html(); 
+    src = tAttrs.mapLazyLoad;
+
+    /**
+     * if already loaded, stop processing it
+     */
+    if (document.querySelector('script[src="'+src+'?callback=lazyLoadCallback"]')) {
+      return false;
+    }
+
+    tElement.html('');  // will compile again after script is loaded
+    return {
+      pre: preLinkFunc
+    };
+  };
+
+  var mapLazyLoad = function(_$compile_, _$timeout_) {
+    $compile = _$compile_, $timeout = _$timeout_;
+    return {
+      compile: compileFunc
+    }
+  };
+  mapLazyLoad.$inject = ['$compile','$timeout'];
+
+  angular.module('ngMap').directive('mapLazyLoad', mapLazyLoad);
+})();
+
+/**
+ * @ngdoc directive
+ * @name map-type
+ * @requires Attr2Options 
+ * @description 
+ *   Requires:  map directive
+ *   Restrict To:  Element
+ *
+ * @example
+ * Example: 
+ *
+ *   <map zoom="13" center="34.04924594193164, -118.24104309082031">
+ *     <map-type name="coordinate" object="coordinateMapType"></map-type>
+ *   </map>
+ */
+(function() {
+  'use strict';
+
+  angular.module('ngMap').directive('mapType', ['Attr2Options', '$window', function(Attr2Options, $window) {
+    var parser = Attr2Options;
+    
+    return {
+      restrict: 'E',
+      require: '^map',
+
+      link: function(scope, element, attrs, mapController) {
+        var mapTypeName = attrs.name, mapTypeObject;
+        if (!mapTypeName) {
+          throw "invalid map-type name";
+        }
+        if (attrs.object) {
+          var __scope = scope[attrs.object] ? scope : $window;
+          mapTypeObject = __scope[attrs.object];
+          if (typeof mapTypeObject == "function") {
+            mapTypeObject = new mapTypeObject();
+          }
+        }
+        if (!mapTypeObject) {
+          throw "invalid map-type object";
+        }
+
+        scope.$on('mapInitialized', function(evt, map) {
+          map.mapTypes.set(mapTypeName, mapTypeObject);
+        });
+        mapController.addObject('mapTypes', mapTypeObject);
+      }
+     }; // return
+  }]);
+})();
+
+/**
+ * @ngdoc directive
+ * @name map
+ * @requires Attr2Options
+ * @description
+ *   Implementation of {@link MapController}
+ *   Initialize a Google map within a `<div>` tag with given options and register events
+ *   It accepts children directives; marker, shape, or marker-clusterer
+ *
+ *   It initialize map, children tags, then emits message as soon as the action is done
+ *   The message emitted from this directive is;
+ *     . mapInitialized
+ *
+ *   Restrict To:
+ *     Element
+ *
+ * @param {Expression} geo-callback if center is an address or current location, the expression is will be executed when geo-lookup is successful. e.g., geo-callback="showMyStoreInfo()"
+ * @param {Array} geo-fallback-center 
+ *    The center of map incase geolocation failed. i.e. [0,0]
+ * @param {Boolean} zoom-to-include-markers
+ *    When true, map boundary will be changed automatially to include all markers when initialized
+ * @param {Boolean} default-style
+ *    When false, the default styling, `display:block;height:300px`, will be ignored.
+ * @param {String} init-event The name of event to initialize this map. 
+ *    If this option is given, the map won't be initialized until the event is received.
+ *    To invoke the event, use $scope.$emit or $scope.$broacast. 
+ *    i.e. <map init-event="init-map" ng-click="$emit('init-map')" center=... ></map>
+ * @param {String} &lt;MapOption> Any Google map options, 
+ *    https://developers.google.com/maps/documentation/javascript/reference?csw=1#MapOptions
+ * @param {String} &lt;MapEvent> Any Google map events, 
+ *    https://rawgit.com/allenhwkim/angularjs-google-maps/master/build/map_events.html
+ * @example
+ * Usage:
+ *   <map MAP_OPTIONS_OR_MAP_EVENTS ..>
+ *     ... Any children directives
+ *   </map>
+ * 
+ * Example:
+ *   <map center="[40.74, -74.18]" on-click="doThat()">
+ *   </map>
+ *
+ *   <map geo-fallback-center="[40.74, -74.18]" zoom-to-inlude-markers="true">
+ *   </map>
+ */
+/* global google */
+(function() {
+  'use strict';
+
+  function getStyle(el,styleProp) {
+    var y;
+    if (el.currentStyle) {
+      y = el.currentStyle[styleProp];
+    } else if (window.getComputedStyle) {
+      y = document.defaultView.getComputedStyle(el,null).getPropertyValue(styleProp);
+    }
+    return y;
+  }
+
+  var mapDirective = function(Attr2Options, $timeout, $parse) {
+    var parser = Attr2Options;
+
+    /**
+     * Initialize map and events
+     * @memberof map
+     * @param {$scope} scope
+     * @param {angular.element} element
+     * @param {Hash} attrs
+     * @ctrl {MapController} ctrl
+     */
+    var linkFunc = function(scope, element, attrs, ctrl) {
+      var orgAttrs = parser.orgAttributes(element);
+
+      scope.google = google;  //used by $scope.eval in Attr2Options to avoid eval()
+
+      /**
+       * create a new `div` inside map tag, so that it does not touch map element
+       * https://stackoverflow.com/questions/20955356
+       */
+      var el = document.createElement("div");
+      el.style.width = "100%";
+      el.style.height = "100%";
+      element.prepend(el);
+
+      /**
+       * if style is not given to the map element, set display and height
+       */
+      if (attrs.defaultStyle !== 'false') {
+        if (getStyle(element[0], 'display') != "block") {
+          element.css('display','block');
+        }
+        if (getStyle(element[0], 'height').match(/^(0|auto)/)) {
+          element.css('height','300px');
+        }
+      }
+
+      /**
+       * disable drag event
+       */
+      element[0].addEventListener('dragstart', function(event) {
+        event.preventDefault();
+        return false;
+      });
+
+      /**
+       * initialize function
+       */
+      var initializeMap = function(mapOptions, mapEvents) {
+        var map = new google.maps.Map(el, {});
+        map.markers = {};
+        map.shapes = {};
+       
+        /**
+         * resize the map to prevent showing partially, in case intialized too early
+         */
+        $timeout(function() {
+          google.maps.event.trigger(map, "resize");
+        });
+
+        /**
+         * set options
+         */
+        mapOptions.zoom = mapOptions.zoom || 15;
+        var center = mapOptions.center;
+        if (!center) {
+          mapOptions.center = new google.maps.LatLng(0,0);
+        } else if (!(center instanceof google.maps.LatLng)) {
+          delete mapOptions.center;
+          ctrl.getGeoLocation(center).then(function(latlng) {
+            map.setCenter(latlng);
+            var geoCallback = attrs.geoCallback;
+            geoCallback && $parse(geoCallback)(scope);
+          }, function(error) {
+            map.setCenter(options.geoFallbackCenter);
+          });
+        }
+        map.setOptions(mapOptions);
+
+        /**
+         * set events
+         */
+        for (var eventName in mapEvents) {
+          if (eventName) {
+            google.maps.event.addListener(map, eventName, mapEvents[eventName]);
+          }
+        }
+
+        /**
+         * set observers
+         */
+        ctrl.observeAttrSetObj(orgAttrs, attrs, map);
+
+        /**
+         * set controller and set objects
+         * so that map can be used by other directives; marker or shape 
+         * ctrl._objects are gathered when marker and shape are initialized before map is set
+         */
+        ctrl.map = map;   /* so that map can be used by other directives; marker or shape */
+        ctrl.addObjects(ctrl._objects);
+
+        // /* providing method to add a marker used by user scope */
+        // map.addMarker = ctrl.addMarker;
+
+        /**
+         * set map for scope and controller and broadcast map event
+         * scope.map will be overwritten if user have multiple maps in a scope,
+         * thus the last map will be set as scope.map.
+         * however an `mapInitialized` event will be emitted every time.
+         */
+        scope.map = map;
+        scope.map.scope = scope;
+        google.maps.event.addListenerOnce(map, "idle", function() {
+          scope.$emit('mapInitialized', map);  
+          if (attrs.zoomToIncludeMarkers == 'auto') {
+            scope.$on('objectChanged', function(evt, msg) {
+              void 0;
+              msg[0] == 'markers' && ctrl.zoomToIncludeMarkers();
+            });
+          }else if (attrs.zoomToIncludeMarkers) {
+            void 0;
+            ctrl.zoomToIncludeMarkers();
+          }
+        });
+      }; // function initializeMap()
+
+      /**
+       * get map options and events
+       */
+      var filtered = parser.filter(attrs);
+      var options = parser.getOptions(filtered, scope);
+      var controlOptions = parser.getControlOptions(filtered);
+      var mapOptions = angular.extend(options, controlOptions);
+      var mapEvents = parser.getEvents(scope, filtered);
+      void 0;
+
+      if (attrs.initEvent) { // allows controlled initialization
+        scope.$on(attrs.initEvent, function() {
+          !ctrl.map && initializeMap(mapOptions, mapEvents); // init if not done
+        });
+      } else {
+        initializeMap(mapOptions, mapEvents);
+      } // if
+    };
+
+    return {
+      restrict: 'AE',
+      controller: 'MapController',
+      link: linkFunc
+    }; 
+  };
+
+  angular.module('ngMap').directive('map', ['Attr2Options', '$timeout', '$parse', mapDirective]);
+})();
+
+/* global google */
+(function() {
+  'use strict';
+
+  /**
+   * @ngdoc controller
+   * @name MapController
+   * @requires $scope
+   * @property {Hash} controls collection of Controls initiated within `map` directive
+   * @property {Hash} markers collection of Markers initiated within `map` directive
+   * @property {Hash} shapes collection of shapes initiated within `map` directive
+   */
+  var MapController = function($scope, $q, NavigatorGeolocation, GeoCoder, Attr2Options) { 
+    var parser = Attr2Options;
+    var _this = this;
+
+    var observeAndSet = function(attrs, attrName, object) {
+      attrs.$observe(attrName, function(val) {
+        if (val) {
+          void 0;
+          var setMethod = parser.camelCase('set-'+attrName);
+          var optionValue = parser.toOptionValue(val, {key: attrName});
+          void 0;
+          if (object[setMethod]) { //if set method does exist
+            /* if an location is being observed */
+            if (attrName.match(/center|position/) && 
+              typeof optionValue == 'string') {
+              _this.getGeoLocation(optionValue).then(function(latlng) {
+                object[setMethod](latlng);
+              });
+            } else {
+              object[setMethod](optionValue);
+            }
+          }
+        }
+      });
+    };
+
+    this.map = null;
+    this._objects = []; /* temporary collection of map objects */
+
+    /**
+     * Add an object to the collection of group
+     * @memberof MapController
+     * @function addObject
+     * @param groupName the name of collection that object belongs to
+     * @param obj  an object to add into a collection, i.e. marker, shape
+     */
+    this.addObject = function(groupName, obj) {
+      /**
+       * objects, i.e. markers and shapes, are initialized before map is initialized
+       * so, we collect those objects, then, we will add to map when map is initialized
+       * However the case as in ng-repeat, we can directly add to map
+       */
+      if (this.map) {
+        this.map[groupName] = this.map[groupName] || {};
+        var len = Object.keys(this.map[groupName]).length;
+        this.map[groupName][obj.id || len] = obj;
+        if (groupName != "infoWindows" && obj.setMap) { //infoWindow.setMap works like infoWindow.open
+          obj.setMap && obj.setMap(this.map);
+        }
+        if (obj.centered && obj.position) {
+          this.map.setCenter(obj.position);
+        }
+        $scope.$emit('objectChanged', [groupName, this.map[groupName]]);
+      } else {
+        obj.groupName = groupName;
+        this._objects.push(obj);
+      }
+    };
+
+    /**
+     * Delete an object from the collection and remove from map
+     * @memberof MapController
+     * @function deleteObject
+     * @param {Array} objs the collection of objects. i.e., map.markers
+     * @param {Object} obj the object to be removed. i.e., marker
+     */
+    this.deleteObject = function(groupName, obj) {
+      /* delete from group */
+      if (obj.map) {
+        var objs = obj.map[groupName];
+        for (var name in objs) {
+          objs[name] === obj && (delete objs[name]);
+        }
+
+        /* delete from map */
+        obj.map && obj.setMap && obj.setMap(null);
+        $scope.$emit('objectChanged', [groupName, this.map[groupName]]);
+      }
+    };
+
+    /**
+     * Add collected objects to map
+     * @memberof MapController
+     * @function addObjects
+     * @param {Array} objects the collection of objects. i.e., map.markers
+     */
+    this.addObjects = function(objects) {
+      for (var i=0; i<objects.length; i++) {
+        var obj=objects[i];
+        if (obj instanceof google.maps.Marker) {
+          this.addObject('markers', obj);
+        } else if (obj instanceof google.maps.Circle ||
+          obj instanceof google.maps.Polygon ||
+          obj instanceof google.maps.Polyline ||
+          obj instanceof google.maps.Rectangle ||
+          obj instanceof google.maps.GroundOverlay) {
+          this.addObject('shapes', obj);
+        } else {
+          this.addObject(obj.groupName, obj);
+        }
+      }
+    };
+
+    /**
+     * returns the location of an address or 'current-location'
+     * @memberof MapController
+     * @function getGeoLocation
+     * @param {String} string an address to find the location
+     * @returns {Promise} latlng the location of the address
+     */
+    this.getGeoLocation = function(string) {
+      var deferred = $q.defer();
+      if (!string || string.match(/^current/i)) { // current location
+        NavigatorGeolocation.getCurrentPosition().then(
+          function(position) {
+            var lat = position.coords.latitude;
+            var lng = position.coords.longitude;
+            var latLng = new google.maps.LatLng(lat,lng);
+            deferred.resolve(latLng);
+          },
+          function(error) {
+            deferred.reject(error);
+          }
+        );
+      } else {
+        GeoCoder.geocode({address: string}).then(
+          function(results) {
+            deferred.resolve(results[0].geometry.location);
+          },
+          function(error) {
+            deferred.reject(error);
+          }
+        );
+      }
+
+      return deferred.promise;
+    };
+
+    /**
+     * watch changes of attribute values and do appropriate action based on attribute name
+     * @memberof MapController
+     * @function observeAttrSetObj
+     * @param {Hash} orgAttrs attributes before its initialization
+     * @param {Hash} attrs    attributes after its initialization
+     * @param {Object} obj    map object that an action is to be done
+     */
+    this.observeAttrSetObj = function(orgAttrs, attrs, obj) {
+      var attrsToObserve = parser.getAttrsToObserve(orgAttrs);
+      if (Object.keys(attrsToObserve).length) {
+        void 0;
+      }
+      for (var i=0; i<attrsToObserve.length; i++) {
+        observeAndSet(attrs, attrsToObserve[i], obj);
+      }
+    };
+
+    /**
+     * include all markers
+     */
+    this.zoomToIncludeMarkers = function() {
+      var bounds = new google.maps.LatLngBounds();
+      for (var marker in this.map.markers) {
+        bounds.extend(this.map.markers[marker].getPosition());
+      }
+      this.map.fitBounds(bounds);
+    };
+
+  }; // MapController
+
+  MapController.$inject = ['$scope', '$q', 'NavigatorGeolocation', 'GeoCoder', 'Attr2Options'];
+  angular.module('ngMap').controller('MapController', MapController);
+})();
+
+/**
+ * @ngdoc directive
+ * @name maps-engine-layer
+ * @description 
+ *   Requires:  map directive
+ *   Restrict To:  Element
+ *
+ * @example
+ * Example: 
+ *   <map zoom="14" center="[59.322506, 18.010025]">
+ *     <maps-engine-layer layer-id="06673056454046135537-08896501997766553811"></maps-engine-layer>
+ *    </map>
+ */
+(function() {
+  'use strict';
+
+  angular.module('ngMap').directive('mapsEngineLayer', ['Attr2Options', function(Attr2Options) {
+    var parser = Attr2Options;
+
+    var getMapsEngineLayer = function(options, events) {
+      var layer = new google.maps.visualization.MapsEngineLayer(options);
+
+      for (var eventName in events) {
+        google.maps.event.addListener(layer, eventName, events[eventName]);
+      }
+
+      return layer;
+    };
+
+    
+    return {
+      restrict: 'E',
+      require: '^map',
+
+      link: function(scope, element, attrs, mapController) {
+        var filtered = parser.filter(attrs);
+        var options = parser.getOptions(filtered);
+        var events = parser.getEvents(scope, filtered, events);
+        void 0;
+
+        var layer = getMapsEngineLayer(options, events);
+        mapController.addObject('mapsEngineLayers', layer);
+      }
+     }; // return
+  }]);
+})();
+
+/**
+ * @ngdoc directive
+ * @name marker
+ * @requires Attr2Options 
+ * @requires NavigatorGeolocation
+ * @description 
+ *   Draw a Google map marker on a map with given options and register events  
+ *   
+ *   Requires:  map directive
+ *
+ *   Restrict To:  Element 
+ *
+ * @param {String} position address, 'current', or [latitude, longitude]  
+ *    example:  
+ *      '1600 Pennsylvania Ave, 20500  Washingtion DC',   
+ *      'current position',  
+ *      '[40.74, -74.18]'  
+ * @param {Boolean} centered if set, map will be centered with this marker
+ * @param {Expression} geo-callback if position is an address, the expression is will be performed when geo-lookup is successful. e.g., geo-callback="showStoreInfo()"
+ * @param {String} &lt;MarkerOption> Any Marker options, https://developers.google.com/maps/documentation/javascript/reference?csw=1#MarkerOptions  
+ * @param {String} &lt;MapEvent> Any Marker events, https://developers.google.com/maps/documentation/javascript/reference
+ * @example
+ * Usage: 
+ *   <map MAP_ATTRIBUTES>
+ *    <marker ANY_MARKER_OPTIONS ANY_MARKER_EVENTS"></MARKER>
+ *   </map>
+ *
+ * Example: 
+ *   <map center="[40.74, -74.18]">
+ *    <marker position="[40.74, -74.18]" on-click="myfunc()"></div>
+ *   </map>
+ *
+ *   <map center="the cn tower">
+ *    <marker position="the cn tower" on-click="myfunc()"></div>
+ *   </map>
+ */
+/* global google */
+(function() {
+  'use strict';
+
+  var getMarker = function(options, events) {
+    var marker;
+
+    /**
+     * set options
+     */
+    if (options.icon instanceof Object) {
+      if ((""+options.icon.path).match(/^[A-Z_]+$/)) {
+        options.icon.path =  google.maps.SymbolPath[options.icon.path];
+      }
+      for (var key in options.icon) {
+        var arr = options.icon[key];
+        if (key == "anchor" || key == "origin") {
+          options.icon[key] = new google.maps.Point(arr[0], arr[1]);
+        } else if (key == "size" || key == "scaledSize") {
+          options.icon[key] = new google.maps.Size(arr[0], arr[1]);
+        } 
+      }
+    }
+    if (!(options.position instanceof google.maps.LatLng)) {
+      options.position = new google.maps.LatLng(0,0);
+    } 
+    marker = new google.maps.Marker(options);
+
+    /**
+     * set events
+     */
+    if (Object.keys(events).length > 0) {
+      void 0;
+    }
+    for (var eventName in events) {
+      if (eventName) {
+        google.maps.event.addListener(marker, eventName, events[eventName]);
+      }
+    }
+
+    return marker;
+  };
+
+  var marker = function(Attr2Options, $parse) {
+    var parser = Attr2Options;
+    var linkFunc = function(scope, element, attrs, mapController) {
+      var orgAttrs = parser.orgAttributes(element);
+      var filtered = parser.filter(attrs);
+      var markerOptions = parser.getOptions(filtered, scope);
+      var markerEvents = parser.getEvents(scope, filtered);
+      void 0;
+
+      var address;
+      if (!(markerOptions.position instanceof google.maps.LatLng)) {
+        address = markerOptions.position;
+      }
+      var marker = getMarker(markerOptions, markerEvents);
+      mapController.addObject('markers', marker);
+      if (address) {
+        mapController.getGeoLocation(address).then(function(latlng) {
+          marker.setPosition(latlng);
+          markerOptions.centered && marker.map.setCenter(latlng);
+          var geoCallback = attrs.geoCallback;
+          geoCallback && $parse(geoCallback)(scope);
+        });
+      }
+
+      /**
+       * set observers
+       */
+      mapController.observeAttrSetObj(orgAttrs, attrs, marker); /* observers */
+      element.bind('$destroy', function() {
+        mapController.deleteObject('markers', marker);
+      });
+    };
+
+    return {
+      restrict: 'E',
+      require: '^map',
+      link: linkFunc
+    };
+  };
+
+  marker.$inject = ['Attr2Options', '$parse'];
+  angular.module('ngMap').directive('marker', marker); 
+
+})();
+
+/**
+ * @ngdoc directive
+ * @name overlay-map-type
+ * @requires Attr2Options 
+ * @description 
+ *   Requires:  map directive
+ *   Restrict To:  Element
+ *
+ * @example
+ * Example: 
+ *
+ *   <map zoom="13" center="34.04924594193164, -118.24104309082031">
+ *     <overlay-map-type index="0" object="coordinateMapType"></map-type>
+ *   </map>
+ */
+(function() {
+  'use strict';
+
+  angular.module('ngMap').directive('overlayMapType', ['Attr2Options', '$window', function(Attr2Options, $window) {
+    var parser = Attr2Options;
+    
+    return {
+      restrict: 'E',
+      require: '^map',
+
+      link: function(scope, element, attrs, mapController) {
+        var overlayMapTypeObject;
+        var initMethod = attrs.initMethod || "insertAt";
+        if (attrs.object) {
+          var __scope = scope[attrs.object] ? scope : $window;
+          overlayMapTypeObject = __scope[attrs.object];
+          if (typeof overlayMapTypeObject == "function") {
+            overlayMapTypeObject = new overlayMapTypeObject();
+          }
+        }
+        if (!overlayMapTypeObject) {
+          throw "invalid map-type object";
+        }
+
+        scope.$on('mapInitialized', function(evt, map) {
+          if (initMethod == "insertAt") {
+            var index = parseInt(attrs.index, 10);
+            map.overlayMapTypes.insertAt(index, overlayMapTypeObject);
+          } else if (initMethod == "push") {
+            map.overlayMapTypes.push(overlayMapTypeObject);
+          }
+        });
+        mapController.addObject('overlayMapTypes', overlayMapTypeObject);
+      }
+     }; // return
+  }]);
+})();
+
+/**
+ * @ngdoc directive
+ * @name places-auto-complete
+ * @requires Attr2Options 
+ * @description 
+ *   Provides address auto complete feature to an input element
+ *   Requires: input tag
+ *   Restrict To: Attribute
+ *
+ * @param {AutoCompleteOptions} Any AutocompleteOptions
+ *    https://developers.google.com/maps/documentation/javascript/3.exp/reference#AutocompleteOptions
+ *
+ * @example
+ * Example: 
+ *   <script src="https://maps.googleapis.com/maps/api/js?libraries=places"></script>
+ *   <input places-auto-complete types="['geocode']" />
+ */
+/* global google */
+(function() {
+  'use strict';
+
+  var placesAutoComplete = function(Attr2Options, $timeout) {
+    var parser = Attr2Options;
+
+    var linkFunc = function(scope, element, attrs, ngModelCtrl) {
+      var filtered = parser.filter(attrs);
+      var options = parser.getOptions(filtered);
+      var events = parser.getEvents(scope, filtered);
+      void 0;
+      var autocomplete = new google.maps.places.Autocomplete(element[0], options);
+      for (var eventName in events) {
+        google.maps.event.addListener(autocomplete, eventName, events[eventName]);
+      }
+      element[0].addEventListener('change', function() {
+        $timeout(function(){
+          ngModelCtrl && ngModelCtrl.$setViewValue(element.val());
+        },100);
+      });
+
+      attrs.$observe('types', function(val) {
+        if (val) {
+          void 0;
+          var optionValue = parser.toOptionValue(val, {key: 'types'});
+          void 0;
+          autocomplete.setTypes(optionValue);
+        }
+      });
+    };
+
+    return {
+      restrict: 'A',
+      require: '?ngModel',
+      link: linkFunc
+    };
+  };
+
+  placesAutoComplete.$inject = ['Attr2Options', '$timeout'];
+  angular.module('ngMap').directive('placesAutoComplete', placesAutoComplete); 
+
+})();
+
+/**
+ * @ngdoc directive
+ * @name shape
+ * @requires Attr2Options 
+ * @description 
+ *   Initialize a Google map shape in map with given options and register events  
+ *   The shapes are:
+ *     . circle
+ *     . polygon
+ *     . polyline
+ *     . rectangle
+ *     . groundOverlay(or image)
+ *   
+ *   Requires:  map directive
+ *
+ *   Restrict To:  Element
+ *
+ * @param {Boolean} centered if set, map will be centered with this marker
+ * @param {Expression} geo-callback if shape is a circle and the center is an address, the expression is will be performed when geo-lookup is successful. e.g., geo-callback="showDetail()"
+ * @param {String} &lt;OPTIONS>
+ *   For circle, [any circle options](https://developers.google.com/maps/documentation/javascript/reference#CircleOptions)  
+ *   For polygon, [any polygon options](https://developers.google.com/maps/documentation/javascript/reference#PolygonOptions)  
+ *   For polyline, [any polyline options](https://developers.google.com/maps/documentation/javascript/reference#PolylineOptions)   
+ *   For rectangle, [any rectangle options](https://developers.google.com/maps/documentation/javascript/reference#RectangleOptions)   
+ *   For image, [any groundOverlay options](https://developers.google.com/maps/documentation/javascript/reference#GroundOverlayOptions)   
+ * @param {String} &lt;MapEvent> Any Shape events, https://developers.google.com/maps/documentation/javascript/reference
+ * @example
+ * Usage: 
+ *   <map MAP_ATTRIBUTES>
+ *    <shape name=SHAPE_NAME ANY_SHAPE_OPTIONS ANY_SHAPE_EVENTS"></MARKER>
+ *   </map>
+ *
+ * Example: 
+ *
+ *   <map zoom="11" center="[40.74, -74.18]">
+ *     <shape id="polyline" name="polyline" geodesic="true" stroke-color="#FF0000" stroke-opacity="1.0" stroke-weight="2"
+ *      path="[[40.74,-74.18],[40.64,-74.10],[40.54,-74.05],[40.44,-74]]" ></shape>
+ *    </map>
+ *
+ *   <map zoom="11" center="[40.74, -74.18]">
+ *     <shape id="polygon" name="polygon" stroke-color="#FF0000" stroke-opacity="1.0" stroke-weight="2"
+ *      paths="[[40.74,-74.18],[40.64,-74.18],[40.84,-74.08],[40.74,-74.18]]" ></shape>
+ *   </map>
+ *   
+ *   <map zoom="11" center="[40.74, -74.18]">
+ *     <shape id="rectangle" name="rectangle" stroke-color='#FF0000' stroke-opacity="0.8" stroke-weight="2"
+ *      bounds="[[40.74,-74.18], [40.78,-74.14]]" editable="true" ></shape>
+ *   </map>
+ *
+ *   <map zoom="11" center="[40.74, -74.18]">
+ *     <shape id="circle" name="circle" stroke-color='#FF0000' stroke-opacity="0.8"stroke-weight="2" 
+ *      center="[40.70,-74.14]" radius="4000" editable="true" ></shape>
+ *   </map>
+ *
+ *   <map zoom="11" center="[40.74, -74.18]">
+ *     <shape id="image" name="image" url="https://www.lib.utexas.edu/maps/historical/newark_nj_1922.jpg"
+ *      bounds="[[40.71,-74.22],[40.77,-74.12]]" opacity="0.7" clickable="true" ></shape>
+ *   </map>
+ *
+ *  For full-working example, please visit 
+ *    [shape example](https://rawgit.com/allenhwkim/angularjs-google-maps/master/build/shape.html)
+ */
+/* global google */
+(function() {
+  'use strict';
+
+  var getBounds = function(points) {
+    return new google.maps.LatLngBounds(points[0], points[1]);
+  };
+  
+  var getShape = function(options, events) {
+    var shape;
+
+    var shapeName = options.name;
+    delete options.name;  //remove name bcoz it's not for options
+    void 0;
+
+    /**
+     * set options
+     */
+    if (options.icons) {
+      for (var i=0; i<options.icons.length; i++) {
+        var el = options.icons[i];
+        if (el.icon.path.match(/^[A-Z_]+$/)) {
+          el.icon.path =  google.maps.SymbolPath[el.icon.path];
+        }
+      }
+    }
+    switch(shapeName) {
+      case "circle":
+        if (!(options.center instanceof google.maps.LatLng)) {
+          options.center = new google.maps.LatLng(0,0);
+        } 
+        shape = new google.maps.Circle(options);
+        break;
+      case "polygon":
+        shape = new google.maps.Polygon(options);
+        break;
+      case "polyline": 
+        shape = new google.maps.Polyline(options);
+        break;
+      case "rectangle": 
+        if (options.bounds) {
+          options.bounds = getBounds(options.bounds);
+        }
+        shape = new google.maps.Rectangle(options);
+        break;
+      case "groundOverlay":
+      case "image":
+        var url = options.url;
+        var bounds = getBounds(options.bounds);
+        var opts = {opacity: options.opacity, clickable: options.clickable, id:options.id};
+        shape = new google.maps.GroundOverlay(url, bounds, opts);
+        break;
+    }
+
+    /**
+     * set events
+     */
+    for (var eventName in events) {
+      if (events[eventName]) {
+        google.maps.event.addListener(shape, eventName, events[eventName]);
+      }
+    }
+    return shape;
+  };
+
+  var shape = function(Attr2Options, $parse) {
+    var parser = Attr2Options;
+
+    var linkFunc = function(scope, element, attrs, mapController) {
+      var orgAttrs = parser.orgAttributes(element);
+      var filtered = parser.filter(attrs);
+      var shapeOptions = parser.getOptions(filtered);
+      var shapeEvents = parser.getEvents(scope, filtered);
+
+      var address, shapeType;
+      shapeType = shapeOptions.name;
+      if (!(shapeOptions.center instanceof google.maps.LatLng)) {
+        address = shapeOptions.center;
+      }
+      var shape = getShape(shapeOptions, shapeEvents);
+      mapController.addObject('shapes', shape);
+
+      if (address && shapeType == 'circle') {
+        mapController.getGeoLocation(address).then(function(latlng) {
+          shape.setCenter(latlng);
+          shape.centered && shape.map.setCenter(latlng);
+          var geoCallback = attrs.geoCallback;
+          geoCallback && $parse(geoCallback)(scope);
+        });
+      }
+
+      /**
+       * set observers
+       */
+      mapController.observeAttrSetObj(orgAttrs, attrs, shape); 
+      element.bind('$destroy', function() {
+        mapController.deleteObject('shapes', shape);
+      });
+    };
+
+    return {
+      restrict: 'E',
+      require: '^map',
+      link: linkFunc
+     }; // return
+  };
+  shape.$inject = ['Attr2Options', '$parse'];
+
+  angular.module('ngMap').directive('shape', shape);
+
+})();
+
+/**
+ * @ngdoc directive
+ * @name streetview-panorama
+ * @requires Attr2Options
+ * @description
+ *   Requires:  map directive
+ *   Restrict To:  Element
+ *
+ * @param container Optional, id or css selector, if given, streetview will be in the given html element
+ * @param {String} &lt;StreetViewPanoramaOption> Any Google StreetViewPanorama options, 
+ *        https://developers.google.com/maps/documentation/javascript/reference?csw=1#StreetViewPanoramaOptions
+ * @param {String} &lt;StreetViewPanoramaEvent> Any Google StreetViewPanorama events, 
+ *        https://developers.google.com/maps/documentation/javascript/reference#StreetViewPanorama 
+ *
+ * @example
+ *   <map zoom="11" center="[40.688738,-74.043871]" >
+ *     <street-view-panorama
+ *       click-to-go="true"
+ *       disable-default-ui="true"
+ *       disable-double-click-zoom="true"
+ *       enable-close-button="true"
+ *       pano="my-pano"
+ *       position="40.688738,-74.043871"
+ *       pov="{heading:0, pitch: 90}"
+ *       scrollwheel="false"
+ *       visible="true">
+ *     </street-view-panorama>
+ *   </map>
+ */
+/* global google */
+(function() {
+  'use strict';
+   
+  var streetViewPanorama = function(Attr2Options) {
+    var parser = Attr2Options;
+  
+    var getStreetViewPanorama = function(map, options, events) {
+      var svp, container;
+      if (options.container) {
+        container = document.getElementById(options.container);
+        container = container || document.querySelector(options.container);
+      }
+      if (container) {
+        svp = new google.maps.StreetViewPanorama(container, options);
+      } else {
+        svp = map.getStreetView();
+        svp.setOptions(options);
+      }
+
+      for (var eventName in events) {
+        eventName &&
+          google.maps.event.addListener(svp, eventName, events[eventName]);
+      }
+      return svp;
+    };
+
+    var linkFunc = function(scope, element, attrs, mapController) {
+      var orgAttrs = parser.orgAttributes(element);
+      var filtered = parser.filter(attrs);
+      var options = parser.getOptions(filtered);
+      var controlOptions = parser.getControlOptions(filtered);
+      var svpOptions = angular.extend(options, controlOptions);
+
+      var svpEvents = parser.getEvents(scope, filtered);
+      void 0;
+ 
+      scope.$on('mapInitialized', function(evt, map) {
+        var svp = getStreetViewPanorama(map, svpOptions, svpEvents);
+
+        map.setStreetView(svp);
+        (!svp.getPosition()) && svp.setPosition(map.getCenter());
+        google.maps.event.addListener(svp, 'position_changed', function() {
+          if (svp.getPosition() !== map.getCenter()) {
+            map.setCenter(svp.getPosition());
+          }
+        });
+        //needed for geo-callback
+        var listener = google.maps.event.addListener(map, 'center_changed', function() {
+          svp.setPosition(map.getCenter());
+          google.maps.event.removeListener(listener);
+        });
+      });
+
+    }; //link
+
+    return {
+      restrict: 'E',
+      require: '^map',
+      link: linkFunc
+    };
+
+  };
+  streetViewPanorama.$inject = ['Attr2Options'];
+
+  angular.module('ngMap').directive('streetViewPanorama', streetViewPanorama);
+})();
+
+/**
+ * @ngdoc directive
+ * @name traffic-layer
+ * @requires Attr2Options 
+ * @description 
+ *   Requires:  map directive
+ *   Restrict To:  Element
+ *
+ * @example
+ * Example: 
+ *
+ *   <map zoom="13" center="34.04924594193164, -118.24104309082031">
+ *     <traffic-layer></traffic-layer>
+ *    </map>
+ */
+(function() {
+  'use strict';
+
+  angular.module('ngMap').directive('trafficLayer', ['Attr2Options', function(Attr2Options) {
+    var parser = Attr2Options;
+    
+    var getLayer = function(options, events) {
+      var layer = new google.maps.TrafficLayer(options);
+      for (var eventName in events) {
+        google.maps.event.addListener(layer, eventName, events[eventName]);
+      }
+      return layer;
+    };
+    
+    return {
+      restrict: 'E',
+      require: '^map',
+
+      link: function(scope, element, attrs, mapController) {
+        var orgAttrs = parser.orgAttributes(element);
+        var filtered = parser.filter(attrs);
+        var options = parser.getOptions(filtered);
+        var events = parser.getEvents(scope, filtered);
+        void 0;
+
+        var layer = getLayer(options, events);
+        mapController.addObject('trafficLayers', layer);
+        mapController.observeAttrSetObj(orgAttrs, attrs, layer);  //observers
+        element.bind('$destroy', function() {
+          mapController.deleteObject('trafficLayers', layer);
+        });
+      }
+     }; // return
+  }]);
+})();
+
+/**
+ * @ngdoc directive
+ * @name transit-layer
+ * @requires Attr2Options 
+ * @description 
+ *   Requires:  map directive
+ *   Restrict To:  Element
+ *
+ * @example
+ * Example: 
+ *
+ *   <map zoom="13" center="34.04924594193164, -118.24104309082031">
+ *     <transit-layer></transit-layer>
+ *    </map>
+ */
+(function() {
+  'use strict';
+
+  angular.module('ngMap').directive('transitLayer', ['Attr2Options', function(Attr2Options) {
+    var parser = Attr2Options;
+    
+    var getLayer = function(options, events) {
+      var layer = new google.maps.TransitLayer(options);
+      for (var eventName in events) {
+        google.maps.event.addListener(layer, eventName, events[eventName]);
+      }
+      return layer;
+    };
+    
+    return {
+      restrict: 'E',
+      require: '^map',
+
+      link: function(scope, element, attrs, mapController) {
+        var orgAttrs = parser.orgAttributes(element);
+        var filtered = parser.filter(attrs);
+        var options = parser.getOptions(filtered);
+        var events = parser.getEvents(scope, filtered);
+        void 0;
+
+        var layer = getLayer(options, events);
+        mapController.addObject('transitLayers', layer);
+        mapController.observeAttrSetObj(orgAttrs, attrs, layer);  //observers
+        element.bind('$destroy', function() {
+          mapController.deleteObject('transitLayers', layer);
+        });
+      }
+     }; // return
+  }]);
+})();
+
+/**
+ * @ngdoc directive
+ * @name weather-layer
+ * @requires Attr2Options 
+ * @description 
+ *   Requires:  map directive
+ *   Restrict To:  Element
+ *
+ * @example
+ * Example: 
+ *
+ *   <map zoom="13" center="34.04924594193164, -118.24104309082031">
+ *     <weather-layer></weather-layer>
+ *    </map>
+ */
+(function() {
+  'use strict';
+
+  angular.module('ngMap').directive('weatherLayer', ['Attr2Options', function(Attr2Options) {
+    var parser = Attr2Options;
+    
+    var getLayer = function(options, events) {
+      var layer = new google.maps.weather.WeatherLayer(options);
+      for (var eventName in events) {
+        google.maps.event.addListener(layer, eventName, events[eventName]);
+      }
+      return layer;
+    };
+    
+    return {
+      restrict: 'E',
+      require: '^map',
+
+      link: function(scope, element, attrs, mapController) {
+        var orgAttrs = parser.orgAttributes(element);
+        var filtered = parser.filter(attrs);
+        var options = parser.getOptions(filtered);
+        var events = parser.getEvents(scope, filtered);
+
+        void 0;
+
+        var layer = getLayer(options, events);
+        mapController.addObject('weatherLayers', layer);
+        mapController.observeAttrSetObj(orgAttrs, attrs, layer);  //observers
+        element.bind('$destroy', function() {
+          mapController.deleteObject('weatherLayers', layer);
+        });
+      }
+     }; // return
+  }]);
+})();
+
+},{}],24:[function(require,module,exports){
 /**
  * Satellizer 0.11.2
  * (c) 2015 Sahat Yalkabov
  * License: MIT
  */
 !function(e,t,n){"use strict";t.module("satellizer",[]).constant("satellizer.config",{httpInterceptor:!0,loginOnSignup:!0,baseUrl:"/",loginRedirect:"/",logoutRedirect:"/",signupRedirect:"/login",loginUrl:"/auth/login",signupUrl:"/auth/signup",loginRoute:"/login",signupRoute:"/signup",tokenRoot:!1,tokenName:"token",tokenPrefix:"satellizer",unlinkUrl:"/auth/unlink/",unlinkMethod:"get",authHeader:"Authorization",authToken:"Bearer",withCredentials:!0,platform:"browser",storage:"localStorage",providers:{google:{name:"google",url:"/auth/google",authorizationEndpoint:"https://accounts.google.com/o/oauth2/auth",redirectUri:e.location.origin||e.location.protocol+"//"+e.location.host,scope:["profile","email"],scopePrefix:"openid",scopeDelimiter:" ",requiredUrlParams:["scope"],optionalUrlParams:["display"],display:"popup",type:"2.0",popupOptions:{width:452,height:633}},facebook:{name:"facebook",url:"/auth/facebook",authorizationEndpoint:"https://www.facebook.com/v2.3/dialog/oauth",redirectUri:(e.location.origin||e.location.protocol+"//"+e.location.host)+"/",scope:["email"],scopeDelimiter:",",requiredUrlParams:["nonce","display","scope"],display:"popup",type:"2.0",popupOptions:{width:580,height:400}},linkedin:{name:"linkedin",url:"/auth/linkedin",authorizationEndpoint:"https://www.linkedin.com/uas/oauth2/authorization",redirectUri:e.location.origin||e.location.protocol+"//"+e.location.host,requiredUrlParams:["state"],scope:["r_emailaddress"],scopeDelimiter:" ",state:"STATE",type:"2.0",popupOptions:{width:527,height:582}},github:{name:"github",url:"/auth/github",authorizationEndpoint:"https://github.com/login/oauth/authorize",redirectUri:e.location.origin||e.location.protocol+"//"+e.location.host,optionalUrlParams:["scope"],scope:["user:email"],scopeDelimiter:" ",type:"2.0",popupOptions:{width:1020,height:618}},yahoo:{name:"yahoo",url:"/auth/yahoo",authorizationEndpoint:"https://api.login.yahoo.com/oauth2/request_auth",redirectUri:e.location.origin||e.location.protocol+"//"+e.location.host,scope:[],scopeDelimiter:",",type:"2.0",popupOptions:{width:559,height:519}},twitter:{name:"twitter",url:"/auth/twitter",authorizationEndpoint:"https://api.twitter.com/oauth/authenticate",redirectUri:e.location.origin||e.location.protocol+"//"+e.location.host,type:"1.0",popupOptions:{width:495,height:645}},live:{name:"live",url:"/auth/live",authorizationEndpoint:"https://login.live.com/oauth20_authorize.srf",redirectUri:e.location.origin||e.location.protocol+"//"+e.location.host,scope:["wl.emails"],scopeDelimiter:" ",requiredUrlParams:["display","scope"],display:"popup",type:"2.0",popupOptions:{width:500,height:560}}}}).provider("$auth",["satellizer.config",function(e){Object.defineProperties(this,{httpInterceptor:{get:function(){return e.httpInterceptor},set:function(t){e.httpInterceptor=t}},loginOnSignup:{get:function(){return e.loginOnSignup},set:function(t){e.loginOnSignup=t}},baseUrl:{get:function(){return e.baseUrl},set:function(t){e.baseUrl=t}},logoutRedirect:{get:function(){return e.logoutRedirect},set:function(t){e.logoutRedirect=t}},loginRedirect:{set:function(t){e.loginRedirect=t},get:function(){return e.loginRedirect}},signupRedirect:{get:function(){return e.signupRedirect},set:function(t){e.signupRedirect=t}},loginUrl:{get:function(){return e.loginUrl},set:function(t){e.loginUrl=t}},signupUrl:{get:function(){return e.signupUrl},set:function(t){e.signupUrl=t}},loginRoute:{get:function(){return e.loginRoute},set:function(t){e.loginRoute=t}},signupRoute:{get:function(){return e.signupRoute},set:function(t){e.signupRoute=t}},tokenRoot:{get:function(){return e.tokenRoot},set:function(t){e.tokenRoot=t}},tokenName:{get:function(){return e.tokenName},set:function(t){e.tokenName=t}},tokenPrefix:{get:function(){return e.tokenPrefix},set:function(t){e.tokenPrefix=t}},unlinkUrl:{get:function(){return e.unlinkUrl},set:function(t){e.unlinkUrl=t}},authHeader:{get:function(){return e.authHeader},set:function(t){e.authHeader=t}},authToken:{get:function(){return e.authToken},set:function(t){e.authToken=t}},withCredentials:{get:function(){return e.withCredentials},set:function(t){e.withCredentials=t}},unlinkMethod:{get:function(){return e.unlinkMethod},set:function(t){e.unlinkMethod=t}},platform:{get:function(){return e.platform},set:function(t){e.platform=t}},storage:{get:function(){return e.storage},set:function(t){e.storage=t}}}),t.forEach(Object.keys(e.providers),function(n){this[n]=function(o){return t.extend(e.providers[n],o)}},this);var n=function(n){e.providers[n.name]=e.providers[n.name]||{},t.extend(e.providers[n.name],n)};this.oauth1=function(t){n(t),e.providers[t.name].type="1.0"},this.oauth2=function(t){n(t),e.providers[t.name].type="2.0"},this.$get=["$q","satellizer.shared","satellizer.local","satellizer.oauth",function(e,t,n,o){var r={};return r.authenticate=function(e,t){return o.authenticate(e,!1,t)},r.login=function(e,t){return n.login(e,t)},r.signup=function(e){return n.signup(e)},r.logout=function(e){return t.logout(e)},r.isAuthenticated=function(){return t.isAuthenticated()},r.link=function(e,t){return o.authenticate(e,!0,t)},r.unlink=function(e){return o.unlink(e)},r.getToken=function(){return t.getToken()},r.setToken=function(e,n){t.setToken({access_token:e},n)},r.removeToken=function(){return t.removeToken()},r.getPayload=function(){return t.getPayload()},r.setStorage=function(e){return t.setStorage(e)},r}]}]).factory("satellizer.shared",["$q","$window","$location","satellizer.config","satellizer.storage",function(n,o,r,i,a){var u={},l=i.tokenPrefix?i.tokenPrefix+"_"+i.tokenName:i.tokenName;return u.getToken=function(){return a.get(l)},u.getPayload=function(){var t=a.get(l);if(t&&3===t.split(".").length){var n=t.split(".")[1],o=n.replace("-","+").replace("_","/");return JSON.parse(decodeURIComponent(escape(e.atob(o))))}},u.setToken=function(e,n){var o,u=e&&e.access_token;if(u&&(t.isObject(u)&&t.isObject(u.data)?e=u:t.isString(u)&&(o=u)),!o&&e&&(o=i.tokenRoot&&e.data[i.tokenRoot]?e.data[i.tokenRoot][i.tokenName]:e.data[i.tokenName]),!o){var s=i.tokenRoot?i.tokenRoot+"."+i.tokenName:i.tokenName;throw new Error('Expecting a token named "'+s+'" but instead got: '+JSON.stringify(e.data))}a.set(l,o),i.loginRedirect&&!n?r.path(i.loginRedirect):n&&t.isString(n)&&r.path(encodeURI(n))},u.removeToken=function(){a.remove(l)},u.isAuthenticated=function(){var e=a.get(l);if(e){if(3===e.split(".").length){var t=e.split(".")[1],n=t.replace("-","+").replace("_","/"),r=JSON.parse(o.atob(n)).exp;return r?Math.round((new Date).getTime()/1e3)<=r:!0}return!0}return!1},u.logout=function(e){return a.remove(l),i.logoutRedirect&&!e?r.url(i.logoutRedirect):t.isString(e)&&r.url(e),n.when()},u.setStorage=function(e){i.storage=e},u}]).factory("satellizer.oauth",["$q","$http","satellizer.config","satellizer.utils","satellizer.shared","satellizer.Oauth1","satellizer.Oauth2",function(e,t,n,o,r,i,a){var u={};return u.authenticate=function(t,o,u){var l="1.0"===n.providers[t].type?new i:new a,s=e.defer();return l.open(n.providers[t],u||{}).then(function(e){r.setToken(e,o),s.resolve(e)}).catch(function(e){s.reject(e)}),s.promise},u.unlink=function(e){var r=n.baseUrl?o.joinUrl(n.baseUrl,n.unlinkUrl):n.unlinkUrl;return"get"===n.unlinkMethod?t.get(r+e):"post"===n.unlinkMethod?t.post(r,e):void 0},u}]).factory("satellizer.local",["$q","$http","$location","satellizer.utils","satellizer.shared","satellizer.config",function(e,t,n,o,r,i){var a={};return a.login=function(e,n){var a=i.baseUrl?o.joinUrl(i.baseUrl,i.loginUrl):i.loginUrl;return t.post(a,e).then(function(e){return r.setToken(e,n),e})},a.signup=function(e){var a=i.baseUrl?o.joinUrl(i.baseUrl,i.signupUrl):i.signupUrl;return t.post(a,e).then(function(e){return i.loginOnSignup?r.setToken(e):i.signupRedirect&&n.path(i.signupRedirect),e})},a}]).factory("satellizer.Oauth2",["$q","$http","$window","satellizer.popup","satellizer.utils","satellizer.config","satellizer.storage",function(e,n,o,r,i,a,u){return function(){var o={url:null,name:null,state:null,scope:null,scopeDelimiter:null,clientId:null,redirectUri:null,popupOptions:null,authorizationEndpoint:null,responseParams:null,requiredUrlParams:null,optionalUrlParams:null,defaultUrlParams:["response_type","client_id","redirect_uri"],responseType:"code"},l={};return l.open=function(n,i){t.extend(o,n);var s=o.name+"_state";t.isFunction(o.state)?u.set(s,o.state()):t.isString(o.state)&&u.set(s,o.state);var c,p=o.authorizationEndpoint+"?"+l.buildQueryString();return c="mobile"===a.platform?r.open(p,o.name,o.popupOptions,o.redirectUri).eventListener(o.redirectUri):r.open(p,o.name,o.popupOptions,o.redirectUri).pollPopup(),c.then(function(t){return"token"===o.responseType?t:t.state&&t.state!==u.get(s)?e.reject("OAuth 2.0 state parameter mismatch."):l.exchangeForToken(t,i)})},l.exchangeForToken=function(e,r){var u=t.extend({},r,{code:e.code,clientId:o.clientId,redirectUri:o.redirectUri});e.state&&(u.state=e.state),t.forEach(o.responseParams,function(t){u[t]=e[t]});var l=a.baseUrl?i.joinUrl(a.baseUrl,o.url):o.url;return n.post(l,u,{withCredentials:a.withCredentials})},l.buildQueryString=function(){var e=[],n=["defaultUrlParams","requiredUrlParams","optionalUrlParams"];return t.forEach(n,function(n){t.forEach(o[n],function(n){var r=i.camelCase(n),a=t.isFunction(o[n])?o[n]():o[r];if("state"===n){var l=o.name+"_state";a=encodeURIComponent(u.get(l))}"scope"===n&&Array.isArray(a)&&(a=a.join(o.scopeDelimiter),o.scopePrefix&&(a=[o.scopePrefix,a].join(o.scopeDelimiter))),e.push([n,a])})}),e.map(function(e){return e.join("=")}).join("&")},l}}]).factory("satellizer.Oauth1",["$q","$http","satellizer.popup","satellizer.config","satellizer.utils",function(e,n,o,r,i){return function(){var e={url:null,name:null,popupOptions:null,redirectUri:null,authorizationEndpoint:null},a={};return a.open=function(u,l){t.extend(e,u);var s,c=r.baseUrl?i.joinUrl(r.baseUrl,e.url):e.url;return"mobile"!==r.platform&&(s=o.open("",e.name,e.popupOptions,e.redirectUri)),n.post(c,e).then(function(t){"mobile"===r.platform?s=o.open([e.authorizationEndpoint,a.buildQueryString(t.data)].join("?"),e.name,e.popupOptions,e.redirectUri):s.popupWindow.location=[e.authorizationEndpoint,a.buildQueryString(t.data)].join("?");var n="mobile"===r.platform?s.eventListener(e.redirectUri):s.pollPopup();return n.then(function(e){return a.exchangeForToken(e,l)})})},a.exchangeForToken=function(o,a){var u=t.extend({},a,o),l=r.baseUrl?i.joinUrl(r.baseUrl,e.url):e.url;return n.post(l,u,{withCredentials:r.withCredentials})},a.buildQueryString=function(e){var n=[];return t.forEach(e,function(e,t){n.push(encodeURIComponent(t)+"="+encodeURIComponent(e))}),n.join("&")},a}}]).factory("satellizer.popup",["$q","$interval","$window","$location","satellizer.config","satellizer.utils",function(o,r,i,a,u,l){var s={};return s.url="",s.popupWindow=null,s.open=function(t,n,o){s.url=t;var r=s.stringifyOptions(s.prepareOptions(o||{}));return s.popupWindow=e.open(t,n,r),s.popupWindow&&s.popupWindow.focus&&s.popupWindow.focus(),s},s.eventListener=function(e){var n=o.defer();return s.popupWindow.addEventListener("loadstart",function(o){if(0===o.url.indexOf(e)){var r=document.createElement("a");if(r.href=o.url,r.search||r.hash){var i=r.search.substring(1).replace(/\/$/,""),a=r.hash.substring(1).replace(/\/$/,""),u=l.parseQueryString(a),c=l.parseQueryString(i);t.extend(c,u),c.error?n.reject({error:c.error}):n.resolve(c),s.popupWindow.close()}}}),s.popupWindow.addEventListener("exit",function(){n.reject({data:"Provider Popup was closed"})}),s.popupWindow.addEventListener("loaderror",function(){n.reject({data:"Authorization Failed"})}),n.promise},s.pollPopup=function(){var e,i=o.defer();return e=r(function(){try{var o=document.location.host,a=s.popupWindow.location.host;if(a===o&&(s.popupWindow.location.search||s.popupWindow.location.hash)){var u=s.popupWindow.location.search.substring(1).replace(/\/$/,""),c=s.popupWindow.location.hash.substring(1).replace(/[\/$]/,""),p=l.parseQueryString(c),d=l.parseQueryString(u);t.extend(d,p),d.error?i.reject({error:d.error}):i.resolve(d),s.popupWindow.close(),r.cancel(e)}}catch(g){}s.popupWindow?(s.popupWindow.closed||s.popupWindow.closed===n)&&(r.cancel(e),i.reject({data:"Authorization Failed"})):(r.cancel(e),i.reject({data:"Provider Popup Blocked"}))},35),i.promise},s.prepareOptions=function(e){var n=e.width||500,o=e.height||500;return t.extend({width:n,height:o,left:i.screenX+(i.outerWidth-n)/2,top:i.screenY+(i.outerHeight-o)/2.5},e)},s.stringifyOptions=function(e){var n=[];return t.forEach(e,function(e,t){n.push(t+"="+e)}),n.join(",")},s}]).service("satellizer.utils",function(){this.camelCase=function(e){return e.replace(/([\:\-\_]+(.))/g,function(e,t,n,o){return o?n.toUpperCase():n})},this.parseQueryString=function(e){var n,o,r={};return t.forEach((e||"").split("&"),function(e){e&&(o=e.split("="),n=decodeURIComponent(o[0]),r[n]=t.isDefined(o[1])?decodeURIComponent(o[1]):!0)}),r},this.joinUrl=function(e,t){if(/^(?:[a-z]+:)?\/\//i.test(t))return t;var n=[e,t].join("/"),o=function(e){return e.replace(/[\/]+/g,"/").replace(/\/\?/g,"?").replace(/\/\#/g,"#").replace(/\:\//g,"://")};return o(n)}}).factory("satellizer.storage",["satellizer.config",function(t){switch(t.storage){case"localStorage":return"localStorage"in e&&null!==e.localStorage?{get:function(e){return localStorage.getItem(e)},set:function(e,t){return localStorage.setItem(e,t)},remove:function(e){return localStorage.removeItem(e)}}:(console.warn("Warning: Local Storage is disabled or unavailable. Satellizer will not work correctly."),{get:function(){return n},set:function(){return n},remove:function(){return n}});case"sessionStorage":return"sessionStorage"in e&&null!==e.sessionStorage?{get:function(e){return sessionStorage.getItem(e)},set:function(e,t){return sessionStorage.setItem(e,t)},remove:function(e){return sessionStorage.removeItem(e)}}:(console.warn("Warning: Session Storage is disabled or unavailable. Satellizer will not work correctly."),{get:function(){return n},set:function(){return n},remove:function(){return n}})}}]).factory("satellizer.interceptor",["$q","satellizer.config","satellizer.storage","satellizer.shared",function(e,t,n,o){return{request:function(e){if(e.skipAuthorization)return e;if(o.isAuthenticated()&&t.httpInterceptor){var r=t.tokenPrefix?t.tokenPrefix+"_"+t.tokenName:t.tokenName,i=n.get(r);t.authHeader&&t.authToken&&(i=t.authToken+" "+i),e.headers[t.authHeader]=i}return e},responseError:function(t){return e.reject(t)}}}]).config(["$httpProvider",function(e){e.interceptors.push("satellizer.interceptor")}])}(window,window.angular);
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 
 module.exports = require('./lib/');
 
-},{"./lib/":25}],25:[function(require,module,exports){
+},{"./lib/":26}],26:[function(require,module,exports){
 
 /**
  * Module dependencies.
@@ -46432,7 +48909,7 @@ exports.connect = lookup;
 exports.Manager = require('./manager');
 exports.Socket = require('./socket');
 
-},{"./manager":26,"./socket":28,"./url":29,"debug":33,"socket.io-parser":69}],26:[function(require,module,exports){
+},{"./manager":27,"./socket":29,"./url":30,"debug":34,"socket.io-parser":70}],27:[function(require,module,exports){
 
 /**
  * Module dependencies.
@@ -46937,7 +49414,7 @@ Manager.prototype.onreconnect = function(){
   this.emitAll('reconnect', attempt);
 };
 
-},{"./on":27,"./socket":28,"./url":29,"backo2":30,"component-bind":31,"component-emitter":32,"debug":33,"engine.io-client":34,"indexof":65,"object-component":66,"socket.io-parser":69}],27:[function(require,module,exports){
+},{"./on":28,"./socket":29,"./url":30,"backo2":31,"component-bind":32,"component-emitter":33,"debug":34,"engine.io-client":35,"indexof":66,"object-component":67,"socket.io-parser":70}],28:[function(require,module,exports){
 
 /**
  * Module exports.
@@ -46963,7 +49440,7 @@ function on(obj, ev, fn) {
   };
 }
 
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 
 /**
  * Module dependencies.
@@ -47350,7 +49827,7 @@ Socket.prototype.disconnect = function(){
   return this;
 };
 
-},{"./on":27,"component-bind":31,"component-emitter":32,"debug":33,"has-binary":63,"socket.io-parser":69,"to-array":73}],29:[function(require,module,exports){
+},{"./on":28,"component-bind":32,"component-emitter":33,"debug":34,"has-binary":64,"socket.io-parser":70,"to-array":74}],30:[function(require,module,exports){
 (function (global){
 
 /**
@@ -47427,7 +49904,7 @@ function url(uri, loc){
 }
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"debug":33,"parseuri":67}],30:[function(require,module,exports){
+},{"debug":34,"parseuri":68}],31:[function(require,module,exports){
 
 /**
  * Expose `Backoff`.
@@ -47514,7 +49991,7 @@ Backoff.prototype.setJitter = function(jitter){
 };
 
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 /**
  * Slice reference.
  */
@@ -47539,7 +50016,7 @@ module.exports = function(obj, fn){
   }
 };
 
-},{}],32:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 
 /**
  * Expose `Emitter`.
@@ -47705,7 +50182,7 @@ Emitter.prototype.hasListeners = function(event){
   return !! this.listeners(event).length;
 };
 
-},{}],33:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 
 /**
  * Expose `debug()` as the module.
@@ -47844,11 +50321,11 @@ try {
   if (window.localStorage) debug.enable(localStorage.debug);
 } catch(e){}
 
-},{}],34:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 
 module.exports =  require('./lib/');
 
-},{"./lib/":35}],35:[function(require,module,exports){
+},{"./lib/":36}],36:[function(require,module,exports){
 
 module.exports = require('./socket');
 
@@ -47860,7 +50337,7 @@ module.exports = require('./socket');
  */
 module.exports.parser = require('engine.io-parser');
 
-},{"./socket":36,"engine.io-parser":48}],36:[function(require,module,exports){
+},{"./socket":37,"engine.io-parser":49}],37:[function(require,module,exports){
 (function (global){
 /**
  * Module dependencies.
@@ -48569,7 +51046,7 @@ Socket.prototype.filterUpgrades = function (upgrades) {
 };
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./transport":37,"./transports":38,"component-emitter":32,"debug":45,"engine.io-parser":48,"indexof":65,"parsejson":59,"parseqs":60,"parseuri":61}],37:[function(require,module,exports){
+},{"./transport":38,"./transports":39,"component-emitter":33,"debug":46,"engine.io-parser":49,"indexof":66,"parsejson":60,"parseqs":61,"parseuri":62}],38:[function(require,module,exports){
 /**
  * Module dependencies.
  */
@@ -48730,7 +51207,7 @@ Transport.prototype.onClose = function () {
   this.emit('close');
 };
 
-},{"component-emitter":32,"engine.io-parser":48}],38:[function(require,module,exports){
+},{"component-emitter":33,"engine.io-parser":49}],39:[function(require,module,exports){
 (function (global){
 /**
  * Module dependencies
@@ -48787,7 +51264,7 @@ function polling(opts){
 }
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./polling-jsonp":39,"./polling-xhr":40,"./websocket":42,"xmlhttprequest":43}],39:[function(require,module,exports){
+},{"./polling-jsonp":40,"./polling-xhr":41,"./websocket":43,"xmlhttprequest":44}],40:[function(require,module,exports){
 (function (global){
 
 /**
@@ -49024,7 +51501,7 @@ JSONPPolling.prototype.doWrite = function (data, fn) {
 };
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./polling":41,"component-inherit":44}],40:[function(require,module,exports){
+},{"./polling":42,"component-inherit":45}],41:[function(require,module,exports){
 (function (global){
 /**
  * Module requirements.
@@ -49412,7 +51889,7 @@ function unloadHandler() {
 }
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./polling":41,"component-emitter":32,"component-inherit":44,"debug":45,"xmlhttprequest":43}],41:[function(require,module,exports){
+},{"./polling":42,"component-emitter":33,"component-inherit":45,"debug":46,"xmlhttprequest":44}],42:[function(require,module,exports){
 /**
  * Module dependencies.
  */
@@ -49659,7 +52136,7 @@ Polling.prototype.uri = function(){
   return schema + '://' + this.hostname + port + this.path + query;
 };
 
-},{"../transport":37,"component-inherit":44,"debug":45,"engine.io-parser":48,"parseqs":60,"xmlhttprequest":43}],42:[function(require,module,exports){
+},{"../transport":38,"component-inherit":45,"debug":46,"engine.io-parser":49,"parseqs":61,"xmlhttprequest":44}],43:[function(require,module,exports){
 /**
  * Module dependencies.
  */
@@ -49899,7 +52376,7 @@ WS.prototype.check = function(){
   return !!WebSocket && !('__initialize' in WebSocket && this.name === WS.prototype.name);
 };
 
-},{"../transport":37,"component-inherit":44,"debug":45,"engine.io-parser":48,"parseqs":60,"ws":62}],43:[function(require,module,exports){
+},{"../transport":38,"component-inherit":45,"debug":46,"engine.io-parser":49,"parseqs":61,"ws":63}],44:[function(require,module,exports){
 // browser shim for xmlhttprequest module
 var hasCORS = require('has-cors');
 
@@ -49937,7 +52414,7 @@ module.exports = function(opts) {
   }
 }
 
-},{"has-cors":57}],44:[function(require,module,exports){
+},{"has-cors":58}],45:[function(require,module,exports){
 
 module.exports = function(a, b){
   var fn = function(){};
@@ -49945,7 +52422,7 @@ module.exports = function(a, b){
   a.prototype = new fn;
   a.prototype.constructor = a;
 };
-},{}],45:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 
 /**
  * This is the web browser implementation of `debug()`.
@@ -50094,7 +52571,7 @@ function load() {
 
 exports.enable(load());
 
-},{"./debug":46}],46:[function(require,module,exports){
+},{"./debug":47}],47:[function(require,module,exports){
 
 /**
  * This is the common logic for both the Node.js and web browser
@@ -50293,7 +52770,7 @@ function coerce(val) {
   return val;
 }
 
-},{"ms":47}],47:[function(require,module,exports){
+},{"ms":48}],48:[function(require,module,exports){
 /**
  * Helpers.
  */
@@ -50406,7 +52883,7 @@ function plural(ms, n, name) {
   return Math.ceil(ms / n) + ' ' + name + 's';
 }
 
-},{}],48:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 (function (global){
 /**
  * Module dependencies.
@@ -51004,7 +53481,7 @@ exports.decodePayloadAsBinary = function (data, binaryType, callback) {
 };
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./keys":49,"after":50,"arraybuffer.slice":51,"base64-arraybuffer":52,"blob":53,"has-binary":54,"utf8":56}],49:[function(require,module,exports){
+},{"./keys":50,"after":51,"arraybuffer.slice":52,"base64-arraybuffer":53,"blob":54,"has-binary":55,"utf8":57}],50:[function(require,module,exports){
 
 /**
  * Gets the keys for an object.
@@ -51025,7 +53502,7 @@ module.exports = Object.keys || function keys (obj){
   return arr;
 };
 
-},{}],50:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 module.exports = after
 
 function after(count, callback, err_cb) {
@@ -51055,7 +53532,7 @@ function after(count, callback, err_cb) {
 
 function noop() {}
 
-},{}],51:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 /**
  * An abstraction for slicing an arraybuffer even when
  * ArrayBuffer.prototype.slice is not supported
@@ -51086,7 +53563,7 @@ module.exports = function(arraybuffer, start, end) {
   return result.buffer;
 };
 
-},{}],52:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 /*
  * base64-arraybuffer
  * https://github.com/niklasvh/base64-arraybuffer
@@ -51147,7 +53624,7 @@ module.exports = function(arraybuffer, start, end) {
   };
 })("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/");
 
-},{}],53:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 (function (global){
 /**
  * Create a blob builder even when vendor prefixes exist
@@ -51200,7 +53677,7 @@ module.exports = (function() {
 })();
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],54:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 (function (global){
 
 /*
@@ -51262,12 +53739,12 @@ function hasBinary(data) {
 }
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"isarray":55}],55:[function(require,module,exports){
+},{"isarray":56}],56:[function(require,module,exports){
 module.exports = Array.isArray || function (arr) {
   return Object.prototype.toString.call(arr) == '[object Array]';
 };
 
-},{}],56:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 (function (global){
 /*! http://mths.be/utf8js v2.0.0 by @mathias */
 ;(function(root) {
@@ -51510,7 +53987,7 @@ module.exports = Array.isArray || function (arr) {
 }(this));
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],57:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 
 /**
  * Module dependencies.
@@ -51535,7 +54012,7 @@ try {
   module.exports = false;
 }
 
-},{"global":58}],58:[function(require,module,exports){
+},{"global":59}],59:[function(require,module,exports){
 
 /**
  * Returns `this`. Execute this without a "context" (i.e. without it being
@@ -51545,7 +54022,7 @@ try {
 
 module.exports = (function () { return this; })();
 
-},{}],59:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 (function (global){
 /**
  * JSON parse.
@@ -51580,7 +54057,7 @@ module.exports = function parsejson(data) {
   }
 };
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],60:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 /**
  * Compiles a querystring
  * Returns string representation of the object
@@ -51619,7 +54096,7 @@ exports.decode = function(qs){
   return qry;
 };
 
-},{}],61:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 /**
  * Parses an URI
  *
@@ -51660,7 +54137,7 @@ module.exports = function parseuri(str) {
     return uri;
 };
 
-},{}],62:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 
 /**
  * Module dependencies.
@@ -51705,7 +54182,7 @@ function ws(uri, protocols, opts) {
 
 if (WebSocket) ws.prototype = WebSocket.prototype;
 
-},{}],63:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 (function (global){
 
 /*
@@ -51767,9 +54244,9 @@ function hasBinary(data) {
 }
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"isarray":64}],64:[function(require,module,exports){
-module.exports=require(55)
-},{}],65:[function(require,module,exports){
+},{"isarray":65}],65:[function(require,module,exports){
+module.exports=require(56)
+},{}],66:[function(require,module,exports){
 
 var indexOf = [].indexOf;
 
@@ -51780,7 +54257,7 @@ module.exports = function(arr, obj){
   }
   return -1;
 };
-},{}],66:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
 
 /**
  * HOP ref.
@@ -51865,7 +54342,7 @@ exports.length = function(obj){
 exports.isEmpty = function(obj){
   return 0 == exports.length(obj);
 };
-},{}],67:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 /**
  * Parses an URI
  *
@@ -51892,7 +54369,7 @@ module.exports = function parseuri(str) {
   return uri;
 };
 
-},{}],68:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 (function (global){
 /*global Blob,File*/
 
@@ -52037,7 +54514,7 @@ exports.removeBlobs = function(data, callback) {
 };
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./is-buffer":70,"isarray":71}],69:[function(require,module,exports){
+},{"./is-buffer":71,"isarray":72}],70:[function(require,module,exports){
 
 /**
  * Module dependencies.
@@ -52439,7 +54916,7 @@ function error(data){
   };
 }
 
-},{"./binary":68,"./is-buffer":70,"component-emitter":32,"debug":33,"isarray":71,"json3":72}],70:[function(require,module,exports){
+},{"./binary":69,"./is-buffer":71,"component-emitter":33,"debug":34,"isarray":72,"json3":73}],71:[function(require,module,exports){
 (function (global){
 
 module.exports = isBuf;
@@ -52456,9 +54933,9 @@ function isBuf(obj) {
 }
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],71:[function(require,module,exports){
-module.exports=require(55)
 },{}],72:[function(require,module,exports){
+module.exports=require(56)
+},{}],73:[function(require,module,exports){
 /*! JSON v3.2.6 | http://bestiejs.github.io/json3 | Copyright 2012-2013, Kit Cambridge | http://kit.mit-license.org */
 ;(function (window) {
   // Convenience aliases.
@@ -53321,7 +55798,7 @@ module.exports=require(55)
   }
 }(this));
 
-},{}],73:[function(require,module,exports){
+},{}],74:[function(require,module,exports){
 module.exports = toArray
 
 function toArray(list, index) {
@@ -53336,6 +55813,6 @@ function toArray(list, index) {
     return array
 }
 
-},{}],74:[function(require,module,exports){
+},{}],75:[function(require,module,exports){
 !function(e,t,n){"use strict";!function o(e,t,n){function a(s,l){if(!t[s]){if(!e[s]){var i="function"==typeof require&&require;if(!l&&i)return i(s,!0);if(r)return r(s,!0);var u=new Error("Cannot find module '"+s+"'");throw u.code="MODULE_NOT_FOUND",u}var c=t[s]={exports:{}};e[s][0].call(c.exports,function(t){var n=e[s][1][t];return a(n?n:t)},c,c.exports,o,e,t,n)}return t[s].exports}for(var r="function"==typeof require&&require,s=0;s<n.length;s++)a(n[s]);return a}({1:[function(o){var a,r,s,l,i=function(e){return e&&e.__esModule?e:{"default":e}},u=o("./modules/handle-dom"),c=o("./modules/utils"),d=o("./modules/handle-swal-dom"),f=o("./modules/handle-click"),p=o("./modules/handle-key"),m=i(p),v=o("./modules/default-params"),y=i(v),h=o("./modules/set-params"),g=i(h);s=l=function(){function o(e){var t=s;return t[e]===n?y["default"][e]:t[e]}var s=arguments[0];if(u.addClass(t.body,"stop-scrolling"),d.resetInput(),s===n)return c.logStr("SweetAlert expects at least 1 attribute!"),!1;var i=c.extend({},y["default"]);switch(typeof s){case"string":i.title=s,i.text=arguments[1]||"",i.type=arguments[2]||"";break;case"object":if(s.title===n)return c.logStr('Missing "title" argument!'),!1;i.title=s.title;for(var p in y["default"])i[p]=o(p);i.confirmButtonText=i.showCancelButton?"Confirm":y["default"].confirmButtonText,i.confirmButtonText=o("confirmButtonText"),i.doneFunction=arguments[1]||null;break;default:return c.logStr('Unexpected type of argument! Expected "string" or "object", got '+typeof s),!1}g["default"](i),d.fixVerticalPosition(),d.openModal(arguments[1]);for(var v=d.getModal(),h=v.querySelectorAll("button"),b=["onclick","onmouseover","onmouseout","onmousedown","onmouseup","onfocus"],w=function(e){return f.handleButton(e,i,v)},C=0;C<h.length;C++)for(var S=0;S<b.length;S++){var x=b[S];h[C][x]=w}d.getOverlay().onclick=w,a=e.onkeydown;var k=function(e){return m["default"](e,i,v)};e.onkeydown=k,e.onfocus=function(){setTimeout(function(){r!==n&&(r.focus(),r=n)},0)},l.enableButtons()},s.setDefaults=l.setDefaults=function(e){if(!e)throw new Error("userParams is required");if("object"!=typeof e)throw new Error("userParams has to be a object");c.extend(y["default"],e)},s.close=l.close=function(){var o=d.getModal();u.fadeOut(d.getOverlay(),5),u.fadeOut(o,5),u.removeClass(o,"showSweetAlert"),u.addClass(o,"hideSweetAlert"),u.removeClass(o,"visible");var s=o.querySelector(".sa-icon.sa-success");u.removeClass(s,"animate"),u.removeClass(s.querySelector(".sa-tip"),"animateSuccessTip"),u.removeClass(s.querySelector(".sa-long"),"animateSuccessLong");var l=o.querySelector(".sa-icon.sa-error");u.removeClass(l,"animateErrorIcon"),u.removeClass(l.querySelector(".sa-x-mark"),"animateXMark");var i=o.querySelector(".sa-icon.sa-warning");return u.removeClass(i,"pulseWarning"),u.removeClass(i.querySelector(".sa-body"),"pulseWarningIns"),u.removeClass(i.querySelector(".sa-dot"),"pulseWarningIns"),setTimeout(function(){var e=o.getAttribute("data-custom-class");u.removeClass(o,e)},300),u.removeClass(t.body,"stop-scrolling"),e.onkeydown=a,e.previousActiveElement&&e.previousActiveElement.focus(),r=n,clearTimeout(o.timeout),!0},s.showInputError=l.showInputError=function(e){var t=d.getModal(),n=t.querySelector(".sa-input-error");u.addClass(n,"show");var o=t.querySelector(".sa-error-container");u.addClass(o,"show"),o.querySelector("p").innerHTML=e,setTimeout(function(){s.enableButtons()},1),t.querySelector("input").focus()},s.resetInputError=l.resetInputError=function(e){if(e&&13===e.keyCode)return!1;var t=d.getModal(),n=t.querySelector(".sa-input-error");u.removeClass(n,"show");var o=t.querySelector(".sa-error-container");u.removeClass(o,"show")},s.disableButtons=l.disableButtons=function(){var e=d.getModal(),t=e.querySelector("button.confirm"),n=e.querySelector("button.cancel");t.disabled=!0,n.disabled=!0},s.enableButtons=l.enableButtons=function(){var e=d.getModal(),t=e.querySelector("button.confirm"),n=e.querySelector("button.cancel");t.disabled=!1,n.disabled=!1},"undefined"!=typeof e?e.sweetAlert=e.swal=s:c.logStr("SweetAlert is a frontend module!")},{"./modules/default-params":2,"./modules/handle-click":3,"./modules/handle-dom":4,"./modules/handle-key":5,"./modules/handle-swal-dom":6,"./modules/set-params":8,"./modules/utils":9}],2:[function(e,t,n){Object.defineProperty(n,"__esModule",{value:!0});var o={title:"",text:"",type:null,allowOutsideClick:!1,showConfirmButton:!0,showCancelButton:!1,closeOnConfirm:!0,closeOnCancel:!0,confirmButtonText:"OK",confirmButtonColor:"#8CD4F5",cancelButtonText:"Cancel",imageUrl:null,imageSize:null,timer:null,customClass:"",html:!1,animation:!0,allowEscapeKey:!0,inputType:"text",inputPlaceholder:"",inputValue:"",showLoaderOnConfirm:!1};n["default"]=o,t.exports=n["default"]},{}],3:[function(t,n,o){Object.defineProperty(o,"__esModule",{value:!0});var a=t("./utils"),r=(t("./handle-swal-dom"),t("./handle-dom")),s=function(t,n,o){function s(e){m&&n.confirmButtonColor&&(p.style.backgroundColor=e)}var u,c,d,f=t||e.event,p=f.target||f.srcElement,m=-1!==p.className.indexOf("confirm"),v=-1!==p.className.indexOf("sweet-overlay"),y=r.hasClass(o,"visible"),h=n.doneFunction&&"true"===o.getAttribute("data-has-done-function");switch(m&&n.confirmButtonColor&&(u=n.confirmButtonColor,c=a.colorLuminance(u,-.04),d=a.colorLuminance(u,-.14)),f.type){case"mouseover":s(c);break;case"mouseout":s(u);break;case"mousedown":s(d);break;case"mouseup":s(c);break;case"focus":var g=o.querySelector("button.confirm"),b=o.querySelector("button.cancel");m?b.style.boxShadow="none":g.style.boxShadow="none";break;case"click":var w=o===p,C=r.isDescendant(o,p);if(!w&&!C&&y&&!n.allowOutsideClick)break;m&&h&&y?l(o,n):h&&y||v?i(o,n):r.isDescendant(o,p)&&"BUTTON"===p.tagName&&sweetAlert.close()}},l=function(e,t){var n=!0;r.hasClass(e,"show-input")&&(n=e.querySelector("input").value,n||(n="")),t.doneFunction(n),t.closeOnConfirm&&sweetAlert.close(),t.showLoaderOnConfirm&&sweetAlert.disableButtons()},i=function(e,t){var n=String(t.doneFunction).replace(/\s/g,""),o="function("===n.substring(0,9)&&")"!==n.substring(9,10);o&&t.doneFunction(!1),t.closeOnCancel&&sweetAlert.close()};o["default"]={handleButton:s,handleConfirm:l,handleCancel:i},n.exports=o["default"]},{"./handle-dom":4,"./handle-swal-dom":6,"./utils":9}],4:[function(n,o,a){Object.defineProperty(a,"__esModule",{value:!0});var r=function(e,t){return new RegExp(" "+t+" ").test(" "+e.className+" ")},s=function(e,t){r(e,t)||(e.className+=" "+t)},l=function(e,t){var n=" "+e.className.replace(/[\t\r\n]/g," ")+" ";if(r(e,t)){for(;n.indexOf(" "+t+" ")>=0;)n=n.replace(" "+t+" "," ");e.className=n.replace(/^\s+|\s+$/g,"")}},i=function(e){var n=t.createElement("div");return n.appendChild(t.createTextNode(e)),n.innerHTML},u=function(e){e.style.opacity="",e.style.display="block"},c=function(e){if(e&&!e.length)return u(e);for(var t=0;t<e.length;++t)u(e[t])},d=function(e){e.style.opacity="",e.style.display="none"},f=function(e){if(e&&!e.length)return d(e);for(var t=0;t<e.length;++t)d(e[t])},p=function(e,t){for(var n=t.parentNode;null!==n;){if(n===e)return!0;n=n.parentNode}return!1},m=function(e){e.style.left="-9999px",e.style.display="block";var t,n=e.clientHeight;return t="undefined"!=typeof getComputedStyle?parseInt(getComputedStyle(e).getPropertyValue("padding-top"),10):parseInt(e.currentStyle.padding),e.style.left="",e.style.display="none","-"+parseInt((n+t)/2)+"px"},v=function(e,t){if(+e.style.opacity<1){t=t||16,e.style.opacity=0,e.style.display="block";var n=+new Date,o=function(e){function t(){return e.apply(this,arguments)}return t.toString=function(){return e.toString()},t}(function(){e.style.opacity=+e.style.opacity+(new Date-n)/100,n=+new Date,+e.style.opacity<1&&setTimeout(o,t)});o()}e.style.display="block"},y=function(e,t){t=t||16,e.style.opacity=1;var n=+new Date,o=function(e){function t(){return e.apply(this,arguments)}return t.toString=function(){return e.toString()},t}(function(){e.style.opacity=+e.style.opacity-(new Date-n)/100,n=+new Date,+e.style.opacity>0?setTimeout(o,t):e.style.display="none"});o()},h=function(n){if("function"==typeof MouseEvent){var o=new MouseEvent("click",{view:e,bubbles:!1,cancelable:!0});n.dispatchEvent(o)}else if(t.createEvent){var a=t.createEvent("MouseEvents");a.initEvent("click",!1,!1),n.dispatchEvent(a)}else t.createEventObject?n.fireEvent("onclick"):"function"==typeof n.onclick&&n.onclick()},g=function(t){"function"==typeof t.stopPropagation?(t.stopPropagation(),t.preventDefault()):e.event&&e.event.hasOwnProperty("cancelBubble")&&(e.event.cancelBubble=!0)};a.hasClass=r,a.addClass=s,a.removeClass=l,a.escapeHtml=i,a._show=u,a.show=c,a._hide=d,a.hide=f,a.isDescendant=p,a.getTopMargin=m,a.fadeIn=v,a.fadeOut=y,a.fireClick=h,a.stopEventPropagation=g},{}],5:[function(t,o,a){Object.defineProperty(a,"__esModule",{value:!0});var r=t("./handle-dom"),s=t("./handle-swal-dom"),l=function(t,o,a){var l=t||e.event,i=l.keyCode||l.which,u=a.querySelector("button.confirm"),c=a.querySelector("button.cancel"),d=a.querySelectorAll("button[tabindex]");if(-1!==[9,13,32,27].indexOf(i)){for(var f=l.target||l.srcElement,p=-1,m=0;m<d.length;m++)if(f===d[m]){p=m;break}9===i?(f=-1===p?u:p===d.length-1?d[0]:d[p+1],r.stopEventPropagation(l),f.focus(),o.confirmButtonColor&&s.setFocusStyle(f,o.confirmButtonColor)):13===i?("INPUT"===f.tagName&&(f=u,u.focus()),f=-1===p?u:n):27===i&&o.allowEscapeKey===!0?(f=c,r.fireClick(f,l)):f=n}};a["default"]=l,o.exports=a["default"]},{"./handle-dom":4,"./handle-swal-dom":6}],6:[function(n,o,a){var r=function(e){return e&&e.__esModule?e:{"default":e}};Object.defineProperty(a,"__esModule",{value:!0});var s=n("./utils"),l=n("./handle-dom"),i=n("./default-params"),u=r(i),c=n("./injected-html"),d=r(c),f=".sweet-alert",p=".sweet-overlay",m=function(){var e=t.createElement("div");for(e.innerHTML=d["default"];e.firstChild;)t.body.appendChild(e.firstChild)},v=function(e){function t(){return e.apply(this,arguments)}return t.toString=function(){return e.toString()},t}(function(){var e=t.querySelector(f);return e||(m(),e=v()),e}),y=function(){var e=v();return e?e.querySelector("input"):void 0},h=function(){return t.querySelector(p)},g=function(e,t){var n=s.hexToRgb(t);e.style.boxShadow="0 0 2px rgba("+n+", 0.8), inset 0 0 0 1px rgba(0, 0, 0, 0.05)"},b=function(n){var o=v();l.fadeIn(h(),10),l.show(o),l.addClass(o,"showSweetAlert"),l.removeClass(o,"hideSweetAlert"),e.previousActiveElement=t.activeElement;var a=o.querySelector("button.confirm");a.focus(),setTimeout(function(){l.addClass(o,"visible")},500);var r=o.getAttribute("data-timer");if("null"!==r&&""!==r){var s=n;o.timeout=setTimeout(function(){var e=(s||null)&&"true"===o.getAttribute("data-has-done-function");e?s(null):sweetAlert.close()},r)}},w=function(){var e=v(),t=y();l.removeClass(e,"show-input"),t.value=u["default"].inputValue,t.setAttribute("type",u["default"].inputType),t.setAttribute("placeholder",u["default"].inputPlaceholder),C()},C=function(e){if(e&&13===e.keyCode)return!1;var t=v(),n=t.querySelector(".sa-input-error");l.removeClass(n,"show");var o=t.querySelector(".sa-error-container");l.removeClass(o,"show")},S=function(){var e=v();e.style.marginTop=l.getTopMargin(v())};a.sweetAlertInitialize=m,a.getModal=v,a.getOverlay=h,a.getInput=y,a.setFocusStyle=g,a.openModal=b,a.resetInput=w,a.resetInputError=C,a.fixVerticalPosition=S},{"./default-params":2,"./handle-dom":4,"./injected-html":7,"./utils":9}],7:[function(e,t,n){Object.defineProperty(n,"__esModule",{value:!0});var o='<div class="sweet-overlay" tabIndex="-1"></div><div class="sweet-alert"><div class="sa-icon sa-error">\n      <span class="sa-x-mark">\n        <span class="sa-line sa-left"></span>\n        <span class="sa-line sa-right"></span>\n      </span>\n    </div><div class="sa-icon sa-warning">\n      <span class="sa-body"></span>\n      <span class="sa-dot"></span>\n    </div><div class="sa-icon sa-info"></div><div class="sa-icon sa-success">\n      <span class="sa-line sa-tip"></span>\n      <span class="sa-line sa-long"></span>\n\n      <div class="sa-placeholder"></div>\n      <div class="sa-fix"></div>\n    </div><div class="sa-icon sa-custom"></div><h2>Title</h2>\n    <p>Text</p>\n    <fieldset>\n      <input type="text" tabIndex="3" />\n      <div class="sa-input-error"></div>\n    </fieldset><div class="sa-error-container">\n      <div class="icon">!</div>\n      <p>Not valid!</p>\n    </div><div class="sa-button-container">\n      <button class="cancel" tabIndex="2">Cancel</button>\n      <div class="sa-confirm-button-container">\n        <button class="confirm" tabIndex="1">OK</button><div class="la-ball-fall">\n          <div></div>\n          <div></div>\n          <div></div>\n        </div>\n      </div>\n    </div></div>';n["default"]=o,t.exports=n["default"]},{}],8:[function(e,t,o){Object.defineProperty(o,"__esModule",{value:!0});var a=e("./utils"),r=e("./handle-swal-dom"),s=e("./handle-dom"),l=["error","warning","info","success","input","prompt"],i=function(e){var t=r.getModal(),o=t.querySelector("h2"),i=t.querySelector("p"),u=t.querySelector("button.cancel"),c=t.querySelector("button.confirm");if(o.innerHTML=e.html?e.title:s.escapeHtml(e.title).split("\n").join("<br>"),i.innerHTML=e.html?e.text:s.escapeHtml(e.text||"").split("\n").join("<br>"),e.text&&s.show(i),e.customClass)s.addClass(t,e.customClass),t.setAttribute("data-custom-class",e.customClass);else{var d=t.getAttribute("data-custom-class");s.removeClass(t,d),t.setAttribute("data-custom-class","")}if(s.hide(t.querySelectorAll(".sa-icon")),e.type&&!a.isIE8()){var f=function(){for(var o=!1,a=0;a<l.length;a++)if(e.type===l[a]){o=!0;break}if(!o)return logStr("Unknown alert type: "+e.type),{v:!1};var i=["success","error","warning","info"],u=n;-1!==i.indexOf(e.type)&&(u=t.querySelector(".sa-icon.sa-"+e.type),s.show(u));var c=r.getInput();switch(e.type){case"success":s.addClass(u,"animate"),s.addClass(u.querySelector(".sa-tip"),"animateSuccessTip"),s.addClass(u.querySelector(".sa-long"),"animateSuccessLong");break;case"error":s.addClass(u,"animateErrorIcon"),s.addClass(u.querySelector(".sa-x-mark"),"animateXMark");break;case"warning":s.addClass(u,"pulseWarning"),s.addClass(u.querySelector(".sa-body"),"pulseWarningIns"),s.addClass(u.querySelector(".sa-dot"),"pulseWarningIns");break;case"input":case"prompt":c.setAttribute("type",e.inputType),c.value=e.inputValue,c.setAttribute("placeholder",e.inputPlaceholder),s.addClass(t,"show-input"),setTimeout(function(){c.focus(),c.addEventListener("keyup",swal.resetInputError)},400)}}();if("object"==typeof f)return f.v}if(e.imageUrl){var p=t.querySelector(".sa-icon.sa-custom");p.style.backgroundImage="url("+e.imageUrl+")",s.show(p);var m=80,v=80;if(e.imageSize){var y=e.imageSize.toString().split("x"),h=y[0],g=y[1];h&&g?(m=h,v=g):logStr("Parameter imageSize expects value with format WIDTHxHEIGHT, got "+e.imageSize)}p.setAttribute("style",p.getAttribute("style")+"width:"+m+"px; height:"+v+"px")}t.setAttribute("data-has-cancel-button",e.showCancelButton),e.showCancelButton?u.style.display="inline-block":s.hide(u),t.setAttribute("data-has-confirm-button",e.showConfirmButton),e.showConfirmButton?c.style.display="inline-block":s.hide(c),e.cancelButtonText&&(u.innerHTML=s.escapeHtml(e.cancelButtonText)),e.confirmButtonText&&(c.innerHTML=s.escapeHtml(e.confirmButtonText)),e.confirmButtonColor&&(c.style.backgroundColor=e.confirmButtonColor,c.style.borderLeftColor=e.confirmLoadingButtonColor,c.style.borderRightColor=e.confirmLoadingButtonColor,r.setFocusStyle(c,e.confirmButtonColor)),t.setAttribute("data-allow-outside-click",e.allowOutsideClick);var b=e.doneFunction?!0:!1;t.setAttribute("data-has-done-function",b),e.animation?"string"==typeof e.animation?t.setAttribute("data-animation",e.animation):t.setAttribute("data-animation","pop"):t.setAttribute("data-animation","none"),t.setAttribute("data-timer",e.timer)};o["default"]=i,t.exports=o["default"]},{"./handle-dom":4,"./handle-swal-dom":6,"./utils":9}],9:[function(t,n,o){Object.defineProperty(o,"__esModule",{value:!0});var a=function(e,t){for(var n in t)t.hasOwnProperty(n)&&(e[n]=t[n]);return e},r=function(e){var t=/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(e);return t?parseInt(t[1],16)+", "+parseInt(t[2],16)+", "+parseInt(t[3],16):null},s=function(){return e.attachEvent&&!e.addEventListener},l=function(t){e.console&&e.console.log("SweetAlert: "+t)},i=function(e,t){e=String(e).replace(/[^0-9a-f]/gi,""),e.length<6&&(e=e[0]+e[0]+e[1]+e[1]+e[2]+e[2]),t=t||0;var n,o,a="#";for(o=0;3>o;o++)n=parseInt(e.substr(2*o,2),16),n=Math.round(Math.min(Math.max(0,n+n*t),255)).toString(16),a+=("00"+n).substr(n.length);return a};o.extend=a,o.hexToRgb=r,o.isIE8=s,o.logStr=l,o.colorLuminance=i},{}]},{},[1]),"function"==typeof define&&define.amd?define(function(){return sweetAlert}):"undefined"!=typeof module&&module.exports&&(module.exports=sweetAlert)}(window,document);
 },{}]},{},[7])
