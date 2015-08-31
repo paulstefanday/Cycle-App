@@ -173,6 +173,7 @@ exports['default'] = /*@ngInject*/["$stateProvider", "$urlRouterProvider", "$aut
   $authProvider.tokenPrefix = 'cycleApp';
   $authProvider.authHeader = 'Authorization';
   $authProvider.authToken = '';
+  $authProvider.cordova = true;
 
   // Facebook
   $authProvider.facebook({

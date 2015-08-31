@@ -13,6 +13,7 @@ test: 54.153.229.210 -i funkey.pem
 NODE_ENV=prod PORT=3000 pm2 start server.js --node-args="--harmony"
 
 ## Todo
+- get it working on mobile
 - combine server/client config?
 - get feed from within a location
 - get working on mobile
