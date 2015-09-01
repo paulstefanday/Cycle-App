@@ -13,7 +13,7 @@ export default /*@ngInject*/ function($stateProvider, $urlRouterProvider, $authP
   $authProvider.tokenPrefix = 'cycleApp';
   $authProvider.authHeader = 'Authorization';
   $authProvider.authToken = '';
-  $authProvider.cordova = true;
+  // $authProvider.cordova = false;
 
   // Facebook
   $authProvider.facebook({
@@ -22,6 +22,7 @@ export default /*@ngInject*/ function($stateProvider, $urlRouterProvider, $authP
     authorizationEndpoint: 'https://www.facebook.com/v2.4/dialog/oauth',
     scope: ["public_profile", "email", "user_birthday"],
     type: '2.4',
+    display: 'touch'
   });
 
 
