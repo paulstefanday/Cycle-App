@@ -189,7 +189,7 @@ exports['default'] = /*@ngInject*/["$stateProvider", "$urlRouterProvider", "$aut
     // authorizationEndpoint: 'https://www.facebook.com/v2.4/dialog/oauth',
     scope: ["public_profile", "email", "user_birthday"],
     type: '2.4',
-    redirectUri: (window.location.origin || window.location.protocol + '//' + window.location.host) + '/',
+    // redirectUri: (window.location.origin || window.location.protocol + '//' + window.location.host) + '/',
     requiredUrlParams: ['display', 'scope'],
     // display: 'touch',
     scopeDelimiter: ',',
