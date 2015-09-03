@@ -20,7 +20,7 @@ export default /*@ngInject*/ function($stateProvider, $urlRouterProvider, $authP
   $authProvider.authHeader = 'Authorization';
   $authProvider.authToken = '';
 
-  $authProvider.platform = window.mobileAndTabletcheck() ? 'mobile' : 'browser';
+  // $authProvider.platform = window.mobileAndTabletcheck() ? 'mobile' : 'browser';
 
   // Facebook
   $authProvider.facebook({

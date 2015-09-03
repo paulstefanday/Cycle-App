@@ -180,7 +180,7 @@ exports['default'] = /*@ngInject*/["$stateProvider", "$urlRouterProvider", "$aut
   $authProvider.authHeader = 'Authorization';
   $authProvider.authToken = '';
 
-  $authProvider.platform = window.mobileAndTabletcheck() ? 'mobile' : 'browser';
+  // $authProvider.platform = window.mobileAndTabletcheck() ? 'mobile' : 'browser';
 
   // Facebook
   $authProvider.facebook({
