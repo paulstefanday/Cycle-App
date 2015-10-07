@@ -7,7 +7,7 @@ class CustomMap {
     this.controllerAs = 'vm';
     this.bindToController = true;
     this.template = `
-        <map ng-style="vm.style" zoom="3" styles="{{vm.colours}}"
+        <map ng-style="vm.style" zoom="14" styles="{{vm.colours}}"
           center="{{ vm.center.latitude }}, {{vm.center.longitude}}"
           draggable="true"
           dragging-cursor="move"
