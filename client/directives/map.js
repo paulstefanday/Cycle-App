@@ -7,15 +7,15 @@ class CustomMap {
     this.controllerAs = 'vm';
     this.bindToController = true;
     this.template = `
+      <div ng-if="vm.center">
         <map ng-style="vm.style" zoom="14" styles="{{vm.colours}}"
           center="{{ vm.center.latitude }}, {{vm.center.longitude}}"
-          draggable="true"
-          dragging-cursor="move"
-          disable-default-u-i="true">
+          draggable="true" dragging-cursor="move" disable-default-u-i="true">
 
           <marker animation="DROP" ng-repeat="marker in vm.markers" position="{{ marker.latitude }}, {{marker.longitude}}"></marker>
 
         </map>
+      </div>
     `;
 
     // <bicycling-layer></bicycling-layer>
@@ -24,10 +24,8 @@ class CustomMap {
 
     this.controller = /*@ngInject*/ function($scope){
 
-      this.center = { latitude: -33.87, longitude: 151.2 }; // Sydney
-
+      // this.center = { latitude: -33.87, longitude: 151.2 }; // Sydney
       this.style = { width:this.height, height:this.width, position:this.position, float:'left', top: 0, left: 0 };
-
       this.colours = [ { "featureType": "landscape", "elementType": "geometry.fill", "stylers": [ { "color": "#60dd8e" } ] },{ "elementType": "labels", "stylers": [ { "visibility": "off" } ] },{ "elementType": "geometry.stroke", "stylers": [ { "visibility": "off" } ] },{ "featureType": "water", "elementType": "geometry.fill", "stylers": [ { "color": "#b2e5f4" } ] },{ } ];
 
     }
