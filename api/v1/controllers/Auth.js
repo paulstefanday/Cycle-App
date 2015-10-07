@@ -14,7 +14,7 @@ var   formidable = require('koa-formidable'),
 module.exports.facebook = function *(next) {
 
   var accessTokenUrl = 'https://graph.facebook.com/v2.4/oauth/access_token';
-  var graphApiUrl = 'https://graph.facebook.com/v2.4/me?fields=id,name,email,birthday';
+  var graphApiUrl = 'https://graph.facebook.com/v2.4/me?fields=id,name,email';
   var params = {
     code: this.request.body.code,
     client_id: this.request.body.clientId,

@@ -25,6 +25,9 @@ app.use(middleware.auth);
 
 M.Activity.hasOne(M.User, "user", "userId", "id")
 
+// Client
+app.use(route.get('/', function *() { this.body = yield render('./client/index.jade'); }));
+
 // HTTP routes
 app.use(mount('/api/v1', require('./api/v1/routes')));
 
@@ -33,8 +36,6 @@ var server = require('http').createServer(app.callback());
 var io = require('socket.io')(server);
 require('./api/v1/controllers/io').activity(io);
 
-// Client
-app.use(route.get('/*', function *() { this.body = yield render('./client/index.jade'); }));
 
 // Listen
 server.listen(config.port);

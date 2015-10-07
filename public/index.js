@@ -171,7 +171,7 @@ exports['default'] = /*@ngInject*/["$stateProvider", "$urlRouterProvider", "$aut
     clientId: process.env.ENV === 'production' ? "535096706647433" : "535124743311296",
     url: '/api/v1/facebook',
     authorizationEndpoint: 'https://www.facebook.com/v2.4/dialog/oauth',
-    scope: ["public_profile", "email", "user_birthday"]
+    scope: ["public_profile", "email"]
   });
 
   // Routes
@@ -216,28 +216,19 @@ var CustomMap = (function () {
     this.restrict = 'E';
     this.controllerAs = 'vm';
     this.bindToController = true;
-    this.template = '\n        <map ng-style="vm.style" zoom="16"\n          center="{{ vm.center.latitude }}, {{vm.center.longitude}}"\n          draggable="true"\n          dragging-cursor="move"\n          keyboard-shortcuts="false"\n          max-zoom="14"\n          min-zoom="6"\n          tilt="45"\n          disable-default-u-i="true"\n          zoom-to-include-markers="auto">\n\n          <bicycling-layer></bicycling-layer>\n\n          <marker animation="DROP" ng-repeat="marker in vm.items" position="{{ marker.latitude }}, {{marker.longitude}}"></marker>\n\n        </map>\n    ';
+    this.template = '\n        <map ng-style="vm.style" zoom="3" styles="{{vm.colours}}"\n          center="{{ vm.center.latitude }}, {{vm.center.longitude}}"\n          draggable="true"\n          dragging-cursor="move"\n          disable-default-u-i="true">\n\n          <marker animation="DROP" ng-repeat="marker in vm.markers" position="{{ marker.latitude }}, {{marker.longitude}}"></marker>\n\n        </map>\n    ';
 
-    this.scope = { height: '@', width: '@', feed: '=', markers: '=', position: '@', center: '=' };
+    // <bicycling-layer></bicycling-layer>
+
+    this.scope = { height: '@', width: '@', markers: '=', position: '@', center: '=' };
 
     this.controller = /*@ngInject*/["$scope", function ($scope) {
-      var _this = this;
-
-      this.items = [];
 
       this.center = { latitude: -33.87, longitude: 151.2 }; // Sydney
 
       this.style = { width: this.height, height: this.width, position: this.position, float: 'left', top: 0, left: 0 };
 
-      $scope.$watchCollection('vm.feed', _lodash2['default'].debounce(function (res) {
-        return _this.update(res);
-      }, 500));
-
-      this.update = function (res) {
-        return _lodash2['default'].difference(res, _this.items).forEach(function (item) {
-          return _this.items.push(item);
-        });
-      };
+      this.colours = [{ "featureType": "landscape", "elementType": "geometry.fill", "stylers": [{ "color": "#60dd8e" }] }, { "elementType": "labels", "stylers": [{ "visibility": "off" }] }, { "elementType": "geometry.stroke", "stylers": [{ "visibility": "off" }] }, { "featureType": "water", "elementType": "geometry.fill", "stylers": [{ "color": "#b2e5f4" }] }, {}];
     }];
   }
 
@@ -378,7 +369,7 @@ var buf = [];
 var jade_mixins = {};
 var jade_interp;
 
-buf.push("<button ng-click=\"vm.report()\" ladda-button=\"vm.laddaLoading\" data-style=\"expand-right\" class=\"report-button ladda-button\">Report</button><custom-map feed=\"vm.feed\" width=\"100%\" height=\"100%\" position=\"absolute\" center=\"vm.center\"></custom-map>");;return buf.join("");
+buf.push("<button ng-click=\"vm.report()\" ladda-button=\"vm.laddaLoading\" data-style=\"expand-right\" class=\"report-button ladda-button\">Report</button><custom-map markers=\"vm.markers\" width=\"100%\" height=\"100%\" position=\"absolute\" center=\"vm.center\"></custom-map>");;return buf.join("");
 };
 },{"jade/runtime":18}],10:[function(require,module,exports){
 Object.defineProperty(exports, "__esModule", {
@@ -388,7 +379,7 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = /*@ngInject*/["$scope", "$q", "$http", "SweetAlert", function ($scope, $q, $http, SweetAlert) {
   var _this = this;
 
-  this.feed = [];
+  this.markers = [];
 
   this.getGeo = function () {
     var q = $q.defer();
@@ -406,6 +397,7 @@ exports["default"] = /*@ngInject*/["$scope", "$q", "$http", "SweetAlert", functi
     _this.getGeo().then(function (res) {
       return $http.post('/api/v1/activity', { latitude: res.latitude, longitude: res.longitude });
     }).then(function (res) {
+      _this.markers.push(res.data);
       SweetAlert.swal("It worked!", "Report sent successfully!", "success");
       _this.laddaLoading = false;
     })["catch"](function (error) {
@@ -415,7 +407,10 @@ exports["default"] = /*@ngInject*/["$scope", "$q", "$http", "SweetAlert", functi
   };
 
   this.getGeo().then(function (res) {
-    return _this.center = res;
+    _this.center = res;
+    return $http.get('/api/v1/activity');
+  }).then(function (res) {
+    return _this.markers = res.data;
   });
 }];
 

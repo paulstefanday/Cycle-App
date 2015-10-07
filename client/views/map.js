@@ -1,6 +1,6 @@
 export default /*@ngInject*/ function ($scope, $q, $http, SweetAlert) {
 
-	this.feed = []
+	this.markers = []
 
   this.getGeo = () => {
     let q = $q.defer();
@@ -18,15 +18,21 @@ export default /*@ngInject*/ function ($scope, $q, $http, SweetAlert) {
     this.getGeo()
       .then(res => $http.post('/api/v1/activity', { latitude: res.latitude, longitude: res.longitude }))
       .then(res => {
+        this.markers.push(res.data)
         SweetAlert.swal("It worked!", "Report sent successfully!", "success")
-        this.laddaLoading = false;
+        this.laddaLoading = false
       })
       .catch(error => {
         SweetAlert.swal("It failed!", "Please try again", "error")
-        this.laddaLoading = false;
+        this.laddaLoading = false
       })
   }
 
-  this.getGeo().then(res => this.center = res);
+  this.getGeo()
+    .then(res => {
+      this.center = res;
+      return $http.get('/api/v1/activity')
+    })
+    .then(res => this.markers = res.data);
 
 }

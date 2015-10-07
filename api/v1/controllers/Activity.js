@@ -19,25 +19,19 @@ var   config = require(__base+'/api/config/config'),
  */
 
 module.exports.create = function *() {
-
  	var body = this.request.body, record, result;
 
  	body.ip = this.req.headers['x-forwarded-for'] || this.req.connection.remoteAddress;
  	body.userId = this.user.id;
  	record = new M.Activity(body);
-  record = yield record.save();
 
-  // console.log(record)
-
- 	this.body = record;
+ 	this.body = yield record.save();
  	this.status = 200;
-
 }
 
 
 module.exports.find = function *() {
-  var userFilter = this.user ? {id: this.user.id } : {};
-  var data = yield M.Activity.filter({}).getJoin({ user: true });  // { _apply: sequence => sequence.get }
-  this.body = data;
-  this.status = 200;
+  // var userFilter = this.user ? {id: this.user.id } : {};
+  // var data =   // { _apply: sequence => sequence.get }
+  this.body = yield M.Activity.filter({}).getJoin({ user: true }).limit(200);
 }

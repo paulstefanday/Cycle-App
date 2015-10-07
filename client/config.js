@@ -14,7 +14,7 @@ export default /*@ngInject*/ function($stateProvider, $urlRouterProvider, $authP
     clientId: process.env.ENV === 'production' ? "535096706647433" : "535124743311296",
     url: '/api/v1/facebook',
     authorizationEndpoint: 'https://www.facebook.com/v2.4/dialog/oauth',
-    scope: ["public_profile", "email", "user_birthday"],
+    scope: ["public_profile", "email"],
   });
 
   // Routes

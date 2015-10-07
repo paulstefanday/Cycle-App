@@ -22,14 +22,6 @@ co(function *(){
 
 	console.log('All tables cleared')
 
-	// create admin account
-  console.log(fake.data.admin)
-	var admin = yield request.post(fake.data.v + '/signup/').send(fake.data.admin).end();
-	fake.data.admin.token = admin.body.token;
-	fake.data.admin.id = jwt.verify(admin.body.token, config.secret).id;
-
-  console.log('Created admin')
-
   for (var i = 1; i < 6; i++) {
     var user = fake.user();
     var join = yield request.post(fake.data.v + '/signup/').send(user).end();
@@ -48,11 +40,9 @@ co(function *(){
 		fake.activities.push(profile.body);
 	}
 
-	console.log('Created ' + fake.profiles.length + ' profiles.')
+	console.log('Created ' + fake.activities.length + ' actions.')
 
-
-	console.log('Token: ' + fake.data.admin.token, 'Activity: ' + fake.activities.length);
-	process.exit()
+  process.exit()
 
 }).catch(function(err){
 	console.log(err);
