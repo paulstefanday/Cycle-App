@@ -19,8 +19,8 @@ module.exports = {
   activity: function() {
   	return {
       ip: chance.ip(),
-      latitude: chance.latitude(),
-      longitude: chance.latitude(),
+      latitude: chance.latitude({min: -33.938981, max: -33.874584}),
+      longitude: chance.longitude({min: 151.045876, max: 151.267319}),
     }
   }
 }

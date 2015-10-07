@@ -23,10 +23,8 @@ angular.module(name, [
 ])
   .config(require('./config'))
 
-
 // App Parts
 require('./bootstrap')(name)
-	.directive(...require('./directives/map'))
   .directive(...require('./directives/nav'))
 	// .factory('socket', /*@ngInject*/ function(socketFactory) {
 	// 	return socketFactory({ prefix: '', ioSocket: io.connect('http://localhost:3000/') })

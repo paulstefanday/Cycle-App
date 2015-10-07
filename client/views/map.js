@@ -1,6 +1,9 @@
 export default /*@ngInject*/ function ($scope, $q, $http, SweetAlert) {
 
 	this.markers = []
+  this.style = { width: '100%', height: '100%', position: 'absolute', float:'left', top: 0, left: 0 };
+  this.colours = [ { "featureType": "landscape", "elementType": "geometry.fill", "stylers": [ { "color": "#60dd8e" } ] },{ "elementType": "labels", "stylers": [ { "visibility": "off" } ] },{ "elementType": "geometry.stroke", "stylers": [ { "visibility": "off" } ] },{ "featureType": "water", "elementType": "geometry.fill", "stylers": [ { "color": "#b2e5f4" } ] },{ } ];
+  // this.center = { latitude: -33.87, longitude: 151.2 };
 
   this.getGeo = () => {
     let q = $q.defer();
@@ -36,3 +39,5 @@ export default /*@ngInject*/ function ($scope, $q, $http, SweetAlert) {
     .then(res => this.markers = res.data);
 
 }
+
+

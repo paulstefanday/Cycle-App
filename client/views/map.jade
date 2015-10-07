@@ -3,9 +3,6 @@ button.report-button.ladda-button(
 	ladda-button="vm.laddaLoading"
 	data-style="expand-right") Report
 
-custom-map(
-	markers="vm.markers"
-	width="100%"
-	height="100%"
-	position="absolute"
-	center="vm.center")
+div( ng-if="vm.center" )
+	map( ng-style="vm.style" zoom="14" styles="{{vm.colours}}" center="{{ vm.center.latitude }}, {{vm.center.longitude}}" draggable="true" dragging-cursor="move" disable-default-u-i="true" )
+		marker( animation="DROP" ng-repeat="marker in vm.markers" position="{{ marker.latitude }}, {{marker.longitude}}" )

@@ -29,8 +29,16 @@ module.exports.create = function *() {
  	this.status = 200;
 }
 
+module.exports.local = function *() {
+  var body = this.request.body;
 
-module.exports.find = function *() {
+  this.body = yield M.Activity.getNearest(
+    r.point(body.longitude, body.latitude),
+    { index: 'location', maxDist: parseInt(this.params.distance) }
+  )
+}
+
+module.exports.findAll = function *() {
   // var userFilter = this.user ? {id: this.user.id } : {};
   // var data =   // { _apply: sequence => sequence.get }
   this.body = yield M.Activity.filter({}).getJoin({ user: true }).limit(200);
