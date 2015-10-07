@@ -14,23 +14,30 @@ var   config = require(__base+'/api/config/config'),
  *
  * @apiSuccessExample Success-Response:
  *     HTTP/1.1 200 OK
- *     { id: 'asdadasdsdadasdad' }
+ *     {}
  *
  */
 
- module.exports.create = function *() {
+module.exports.create = function *() {
 
  	var body = this.request.body, record, result;
 
  	body.ip = this.req.headers['x-forwarded-for'] || this.req.connection.remoteAddress;
  	body.userId = this.user.id;
-
- 	console.log(body);
-
  	record = new M.Activity(body);
- 	result = yield record.save();
+  record = yield record.save();
 
- 	this.body = result;
+  // console.log(record)
+
+ 	this.body = record;
  	this.status = 200;
 
- }
+}
+
+
+module.exports.find = function *() {
+  var userFilter = this.user ? {id: this.user.id } : {};
+  var data = yield M.Activity.filter({}).getJoin({ user: true });  // { _apply: sequence => sequence.get }
+  this.body = data;
+  this.status = 200;
+}

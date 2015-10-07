@@ -9,8 +9,7 @@
     "build": "ENV=production node_modules/.bin/gulp",
     "server": "node_modules/.bin/nodemon --harmony --watch server.js",
     "docs": "./node_modules/apidoc/bin/apidoc -i api/ -o docs/",
-    "up": "node --harmony up.js",
-    "down": "node --harmony down.js"
+    "up": "node --harmony up.js"
   },
   "author": "Paul Day",
   "license": "MIT",

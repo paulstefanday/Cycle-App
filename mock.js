@@ -1,4 +1,4 @@
-var config = require('./config/config'),
+var config = require(__base+'/api/config/config'),
 	Chance = require('chance'),
     chance = new Chance(),
     _ = require('lodash');
@@ -19,18 +19,19 @@ module.exports.user = function() {
 
 	return {
 		first_name: chance.first(),
-	    last_name: chance.last(),
-	    email: chance.email(),
-	    password: chance.string({length: 8})
+    last_name: chance.last(),
+    email: chance.email(),
+    password: chance.string({length: 8})
 	};
 
 }
 
-module.exports.activtiy = function() {
+module.exports.activity = function() {
 
 	return {
-	    ip: chance.ip(),
-	    data: chance.pick(['Overlord', 'Head of cat cuddling', 'Senior Cat cuddler', 'Thai food tester', 'Fart donator', 'Senior VP of farts', 'Head of naps']),
-	}
+    ip: chance.ip(),
+    latitude: chance.latitude(),
+    longitude: chance.latitude(),
+  }
 
 }

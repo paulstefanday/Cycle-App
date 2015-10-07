@@ -9,7 +9,9 @@ var app = require('./server'),
 	r = thinky.r,
 	fake = require('./mock.js'),
 	jwt = require('jsonwebtoken'),
-	amount = process.env.a ? process.env.a : 40;
+  Chance = require('chance'),
+  chance = new Chance(),
+	amount = process.env.a ? process.env.a : 1000;
 
 co(function *(){
 
@@ -21,15 +23,28 @@ co(function *(){
 	console.log('All tables cleared')
 
 	// create admin account
+  console.log(fake.data.admin)
 	var admin = yield request.post(fake.data.v + '/signup/').send(fake.data.admin).end();
 	fake.data.admin.token = admin.body.token;
 	fake.data.admin.id = jwt.verify(admin.body.token, config.secret).id;
 
-	console.log('Created admin')
+  console.log('Created admin')
 
-	// 
+  for (var i = 1; i < 6; i++) {
+    var user = fake.user();
+    var join = yield request.post(fake.data.v + '/signup/').send(user).end();
+    user = yield M.User.filter({email: user.email})
+    user[0].token = join.body.token;
+    fake.users.push(user[0]);
+  }
+
+  console.log('Created 5 users')
+
+	//
 	for (var i = 1; i < amount; i++) {
-		var profile = yield request.post(fake.data.v + '/activity').send(fake.activity()).end();
+    var record = fake.activity();
+    var count = chance.integer({min: 0, max: 4});
+		var profile = yield request.post(fake.data.v + '/activity').set('Authorization', fake.users[count].token).send(record).end();
 		fake.activities.push(profile.body);
 	}
 
