@@ -5,4 +5,4 @@ button.report-button.ladda-button(
 
 div( ng-if="vm.center" )
 	map( ng-style="vm.style" zoom="14" styles="{{vm.colours}}" center="{{ vm.center.latitude }}, {{vm.center.longitude}}" draggable="true" dragging-cursor="move" disable-default-u-i="true" )
-		marker( animation="DROP" ng-repeat="marker in vm.markers" position="{{ marker.latitude }}, {{marker.longitude}}" )
+		marker( animation="DROP" ng-repeat="marker in vm.markers" position="{{ marker.doc.latitude }}, {{marker.doc.longitude}}" )

@@ -32,10 +32,10 @@ module.exports.create = function *() {
 module.exports.local = function *() {
   var body = this.request.body;
 
-  this.body = yield M.Activity.getNearest(
+  this.body = yield r.db(config.db.db).table("activities").getNearest(
     r.point(body.longitude, body.latitude),
     { index: 'location', maxDist: parseInt(this.params.distance) }
-  )
+  ).run()
 }
 
 module.exports.findAll = function *() {

@@ -18,7 +18,7 @@ activities.pre('save', function(next) {
   next()
 });
 
+activities.ensureIndex('location', {geo: true})
 activities.ensureIndex("createdAt");
-activities.ensureIndex("location");
 
 module.exports = activities;

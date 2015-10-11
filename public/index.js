@@ -290,15 +290,16 @@ var jade_interp;
 buf.push("<div id=\"home\" class=\"box\"><div class=\"logo\"><img src=\"public/logo.png\" style=\"margin-top:-40px;\"/></div><br/><button ng-if=\"!vm.isUser()\" ng-click=\"vm.authenticate('facebook')\" ladda-button=\"vm.laddaLoading\" data-style=\"expand-right\" class=\"ladda-button\">Login via Facebook</button><button ng-if=\"vm.isUser()\" ui-sref=\"report\" class=\"ladda-button\">Report</button></div>");;return buf.join("");
 };
 },{"jade/runtime":17}],7:[function(require,module,exports){
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-exports['default'] = /*@ngInject*/["$auth", "$state", function ($auth, $state) {
+exports["default"] = /*@ngInject*/["$auth", "$state", function ($auth, $state) {
 
   this.authenticate = function (provider) {
     $auth.authenticate(provider).then(function (res) {
-      return $state.go('map');
+      SweetAlert.swal("Welcome", "Submit a report now!", "success");
+      $state.go('map');
     });
   };
 
@@ -307,7 +308,7 @@ exports['default'] = /*@ngInject*/["$auth", "$state", function ($auth, $state) {
   };
 }];
 
-module.exports = exports['default'];
+module.exports = exports["default"];
 
 },{}],8:[function(require,module,exports){
 var jade = require("jade/runtime");
@@ -317,7 +318,7 @@ var buf = [];
 var jade_mixins = {};
 var jade_interp;
 
-buf.push("<button ng-click=\"vm.report()\" ladda-button=\"vm.laddaLoading\" data-style=\"expand-right\" class=\"report-button ladda-button\">Report</button><div ng-if=\"vm.center\"><map ng-style=\"vm.style\" zoom=\"14\" styles=\"{{vm.colours}}\" center=\"{{ vm.center.latitude }}, {{vm.center.longitude}}\" draggable=\"true\" dragging-cursor=\"move\" disable-default-u-i=\"true\"><marker animation=\"DROP\" ng-repeat=\"marker in vm.markers\" position=\"{{ marker.latitude }}, {{marker.longitude}}\"></marker></map></div>");;return buf.join("");
+buf.push("<button ng-click=\"vm.report()\" ladda-button=\"vm.laddaLoading\" data-style=\"expand-right\" class=\"report-button ladda-button\">Report</button><div ng-if=\"vm.center\"><map ng-style=\"vm.style\" zoom=\"14\" styles=\"{{vm.colours}}\" center=\"{{ vm.center.latitude }}, {{vm.center.longitude}}\" draggable=\"true\" dragging-cursor=\"move\" disable-default-u-i=\"true\"><marker animation=\"DROP\" ng-repeat=\"marker in vm.markers\" position=\"{{ marker.doc.latitude }}, {{marker.doc.longitude}}\"></marker></map></div>");;return buf.join("");
 };
 },{"jade/runtime":17}],9:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
@@ -330,16 +331,29 @@ exports['default'] = /*@ngInject*/["$scope", "$q", "$http", "SweetAlert", functi
   this.markers = [];
   this.style = { width: '100%', height: '100%', position: 'absolute', float: 'left', top: 0, left: 0 };
   this.colours = [{ "featureType": "landscape", "elementType": "geometry.fill", "stylers": [{ "color": "#60dd8e" }] }, { "elementType": "labels", "stylers": [{ "visibility": "off" }] }, { "elementType": "geometry.stroke", "stylers": [{ "visibility": "off" }] }, { "featureType": "water", "elementType": "geometry.fill", "stylers": [{ "color": "#b2e5f4" }] }, {}];
-  // this.center = { latitude: -33.87, longitude: 151.2 };
 
   this.getGeo = function () {
     var q = $q.defer();
     navigator.geolocation.getCurrentPosition(function (pos) {
+      _this.center = { latitude: pos.coords.latitude, longitude: pos.coords.longitude } || { latitude: -33.87, longitude: 151.2 };
       q.resolve({ latitude: pos.coords.latitude, longitude: pos.coords.longitude });
     }, function (error) {
       q.reject(error);
     });
     return q.promise;
+  };
+
+  $scope.$on('mapInitialized', function (event, map) {
+    // map.addListener('center_changed', () => console.log('changed') );
+    map.addListener('mouseup', function () {
+      return _this.getMarkers(3000, map.center.J, map.center.M);
+    });
+  });
+
+  this.getMarkers = function (distance, latitude, longitude) {
+    $http.post('/api/v1/activity/' + distance, { latitude: latitude, longitude: longitude }).then(function (res) {
+      return _this.markers = res.data;
+    });
   };
 
   // Report
@@ -358,10 +372,7 @@ exports['default'] = /*@ngInject*/["$scope", "$q", "$http", "SweetAlert", functi
   };
 
   this.getGeo().then(function (res) {
-    _this.center = res;
-    return $http.get('/api/v1/activity');
-  }).then(function (res) {
-    return _this.markers = res.data;
+    return _this.getMarkers(3000, _this.center.latitude, _this.center.longitude);
   });
 }];
 
