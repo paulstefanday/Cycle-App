@@ -14,7 +14,7 @@ NODE_ENV=prod PORT=3000 pm2 start server.js --node-args="--harmony"
 
 ## Todo
 //- get feed from within a location
-- mouse over pointer and see: time, headline(what happened)
+//- mouse over pointer and see: time, headline(what happened)
 - click on pointer and it goes to full report
 - view reports page to edit/add more info
 - two buttons, one for current locatino, other for another location

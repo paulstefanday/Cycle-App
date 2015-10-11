@@ -1,6 +1,6 @@
 import { style, colours, types } from './map.data';
 
-export default /*@ngInject*/ function ($scope, $q, $http, SweetAlert) {
+export default /*@ngInject*/ function ($scope, $q, $http, SweetAlert, $timeout) {
 
 	this.markers = []
   this.style = style
@@ -24,7 +24,13 @@ export default /*@ngInject*/ function ($scope, $q, $http, SweetAlert) {
 
   this.getMarkers = (distance, latitude, longitude) => {
     $http.post(`/api/v1/activity/${distance}`, { latitude, longitude })
-      .then(res => this.markers = res.data )
+      .then(res => {
+        let time = 0;
+        res.data.forEach(item => {
+          $timeout(() => this.markers.push(res.data[time]), time * 100)
+          time++
+        })
+      })
   }
 
   // Report

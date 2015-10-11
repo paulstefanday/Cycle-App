@@ -346,7 +346,7 @@ var buf = [];
 var jade_mixins = {};
 var jade_interp;
 
-buf.push("<div ng-show=\"vm.reporting\" class=\"map-report\"><div class=\"box\"><button ng-click=\"vm.report('Accident')\" ladda-button=\"vm.laddaLoading\" data-style=\"expand-right\" class=\"ladda-button\">Accident</button><button ng-click=\"vm.report('Close Call')\" ladda-button=\"vm.laddaLoading\" data-style=\"expand-right\" class=\"ladda-button\">Close Call</button><br/><button ng-click=\"vm.report('Verbal Abuse')\" ladda-button=\"vm.laddaLoading\" data-style=\"expand-right\" class=\"ladda-button\">Verbal Abuse</button><button ng-click=\"vm.report('Horn Abuse')\" ladda-button=\"vm.laddaLoading\" data-style=\"expand-right\" class=\"ladda-button\">Horn Abuse</button><br/><button ng-click=\"vm.reporting = false\" class=\"ladda-button\">Cancel</button></div></div><button ng-click=\"vm.showReport()\" ladda-button=\"vm.laddaLoading\" data-style=\"expand-right\" class=\"report-button ladda-button\">Report</button><div ng-if=\"vm.center\"><map ng-style=\"vm.style\" zoom=\"14\" styles=\"{{vm.colours}}\" center=\"{{ vm.center.latitude }}, {{vm.center.longitude}}\" draggable=\"true\" dragging-cursor=\"move\" disable-default-u-i=\"true\"><div ng-repeat=\"marker in vm.markers\"><marker on-mouseover=\"showInfoWindow(event, '{{marker.doc.id}}')\" on-mouseout=\"hideInfoWindow(event, '{{marker.doc.id}}')\" animation=\"DROP\" position=\"{{ marker.doc.latitude }}, {{marker.doc.longitude}}\"></marker><info-window id=\"{{marker.doc.id}}\" max-width=\"400\"><div ng-non-bindable=\"\" style=\"color:#333\"><p>Created at {{ marker.doc.createdAt | date }}</p><p>Incident was classified as a \"{{ marker.doc.type }}\"</p></div></info-window></div></map></div>");;return buf.join("");
+buf.push("<div ng-show=\"vm.reporting\" class=\"map-report\"><div class=\"box\"><button ng-click=\"vm.report('Accident')\" ladda-button=\"vm.laddaLoading\" data-style=\"expand-right\" class=\"ladda-button\">Accident</button><button ng-click=\"vm.report('Close Call')\" ladda-button=\"vm.laddaLoading\" data-style=\"expand-right\" class=\"ladda-button\">Close Call</button><br/><button ng-click=\"vm.report('Verbal Abuse')\" ladda-button=\"vm.laddaLoading\" data-style=\"expand-right\" class=\"ladda-button\">Verbal Abuse</button><button ng-click=\"vm.report('Horn Abuse')\" ladda-button=\"vm.laddaLoading\" data-style=\"expand-right\" class=\"ladda-button\">Horn Abuse</button><br/><button ng-click=\"vm.reporting = false\" class=\"ladda-button\">Cancel</button></div></div><button ng-click=\"vm.showReport()\" ladda-button=\"vm.laddaLoading\" data-style=\"expand-right\" class=\"report-button ladda-button\">Report</button><div ng-if=\"vm.center\"><map ng-style=\"vm.style\" zoom=\"14\" styles=\"{{vm.colours}}\" center=\"{{ vm.center.latitude }}, {{vm.center.longitude}}\" draggable=\"true\" dragging-cursor=\"move\" disable-default-u-i=\"true\"><div ng-repeat=\"marker in vm.markers track by marker.distance\"><marker on-mouseover=\"showInfoWindow(event, '{{marker.doc.id}}')\" on-mouseout=\"hideInfoWindow(event, '{{marker.doc.id}}')\" animation=\"DROP\" position=\"{{ marker.doc.latitude }}, {{marker.doc.longitude}}\"></marker><info-window id=\"{{marker.doc.id}}\" max-width=\"400\"><div ng-non-bindable=\"\" style=\"color:#333\"><p>Created at {{ marker.doc.createdAt | date }}</p><p>Incident was classified as a \"{{ marker.doc.type }}\"</p></div></info-window></div></map></div>");;return buf.join("");
 };
 },{"jade/runtime":18}],10:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
@@ -355,7 +355,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _mapData = require('./map.data');
 
-exports['default'] = /*@ngInject*/["$scope", "$q", "$http", "SweetAlert", function ($scope, $q, $http, SweetAlert) {
+exports['default'] = /*@ngInject*/["$scope", "$q", "$http", "SweetAlert", "$timeout", function ($scope, $q, $http, SweetAlert, $timeout) {
   var _this = this;
 
   this.markers = [];
@@ -384,7 +384,13 @@ exports['default'] = /*@ngInject*/["$scope", "$q", "$http", "SweetAlert", functi
 
   this.getMarkers = function (distance, latitude, longitude) {
     $http.post('/api/v1/activity/' + distance, { latitude: latitude, longitude: longitude }).then(function (res) {
-      return _this.markers = res.data;
+      var time = 0;
+      res.data.forEach(function (item) {
+        $timeout(function () {
+          return _this.markers.push(res.data[time]);
+        }, time * 100);
+        time++;
+      });
     });
   };
 
