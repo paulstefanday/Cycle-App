@@ -1,8 +1,37 @@
+.map-report(ng-show="vm.reporting")
+	.box
+		button.ladda-button(
+			ng-click="vm.report('Accident')"
+			ladda-button="vm.laddaLoading"
+			data-style="expand-right") Accident
+
+		button.ladda-button(
+			ng-click="vm.report('Close Call')"
+			ladda-button="vm.laddaLoading"
+			data-style="expand-right") Close Call
+
+		br
+
+		button.ladda-button(
+			ng-click="vm.report('Verbal Abuse')"
+			ladda-button="vm.laddaLoading"
+			data-style="expand-right") Verbal Abuse
+
+		button.ladda-button(
+			ng-click="vm.report('Horn Abuse')"
+			ladda-button="vm.laddaLoading"
+			data-style="expand-right") Horn Abuse
+
 button.report-button.ladda-button(
-	ng-click="vm.report()"
+	ng-click="vm.showReport()"
 	ladda-button="vm.laddaLoading"
 	data-style="expand-right") Report
 
 div( ng-if="vm.center" )
 	map( ng-style="vm.style" zoom="14" styles="{{vm.colours}}" center="{{ vm.center.latitude }}, {{vm.center.longitude}}" draggable="true" dragging-cursor="move" disable-default-u-i="true" )
-		marker( animation="DROP" ng-repeat="marker in vm.markers" position="{{ marker.doc.latitude }}, {{marker.doc.longitude}}" )
+		div(ng-repeat="marker in vm.markers")
+			marker( on-mouseover="showInfoWindow(event, '{{marker.doc.id}}')" on-mouseout="hideInfoWindow(event, '{{marker.doc.id}}')" animation="DROP"  position="{{ marker.doc.latitude }}, {{marker.doc.longitude}}" )
+			info-window( id="{{marker.doc.id}}" max-width='400')
+				div(ng-non-bindable='' style="color:#333")
+					p Created at {{ marker.doc.createdAt | date }}
+					p Incident was classified as a "{{ marker.doc.type }}"

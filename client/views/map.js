@@ -1,21 +1,25 @@
+import { style, colours, types } from './map.data';
+
 export default /*@ngInject*/ function ($scope, $q, $http, SweetAlert) {
 
 	this.markers = []
-  this.style = { width: '100%', height: '100%', position: 'absolute', float:'left', top: 0, left: 0 };
-  this.colours = [ { "featureType": "landscape", "elementType": "geometry.fill", "stylers": [ { "color": "#60dd8e" } ] },{ "elementType": "labels", "stylers": [ { "visibility": "off" } ] },{ "elementType": "geometry.stroke", "stylers": [ { "visibility": "off" } ] },{ "featureType": "water", "elementType": "geometry.fill", "stylers": [ { "color": "#b2e5f4" } ] },{ } ];
+  this.style = style
+  this.colours = colours
+  this.types = types
+  this.distance = 3000
 
+  // Map
   this.getGeo = () => {
     let q = $q.defer();
     navigator.geolocation.getCurrentPosition(pos => {
       this.center = { latitude: pos.coords.latitude, longitude: pos.coords.longitude } || { latitude: -33.87, longitude: 151.2 };
-      q.resolve({ latitude: pos.coords.latitude, longitude: pos.coords.longitude });
+      q.resolve(this.center);
     }, error => { q.reject(error); });
     return q.promise;
   }
 
   $scope.$on('mapInitialized', (event, map) => {
-    // map.addListener('center_changed', () => console.log('changed') );
-    map.addListener('mouseup', () => this.getMarkers(3000, map.center.J, map.center.M ) );
+    map.addListener('mouseup', () => this.getMarkers(this.distance, map.center.J, map.center.M ) );
   });
 
   this.getMarkers = (distance, latitude, longitude) => {
@@ -23,12 +27,14 @@ export default /*@ngInject*/ function ($scope, $q, $http, SweetAlert) {
       .then(res => this.markers = res.data )
   }
 
-
   // Report
-  this.report = () => {
+  this.showReport = () => this.reporting = true;
+
+  this.report = (type) => {
+    this.reporting = false;
     this.laddaLoading = true;
     this.getGeo()
-      .then(res => $http.post('/api/v1/activity', { latitude: res.latitude, longitude: res.longitude }))
+      .then(res => $http.post('/api/v1/activity', { type: type, latitude: res.latitude, longitude: res.longitude }))
       .then(res => {
         this.markers.push(res.data)
         SweetAlert.swal("It worked!", "Report sent successfully!", "success")
@@ -40,8 +46,10 @@ export default /*@ngInject*/ function ($scope, $q, $http, SweetAlert) {
       })
   }
 
-  this.getGeo()
-    .then(res => this.getMarkers(3000, this.center.latitude, this.center.longitude ) )
+  // Init
+  this.getGeo().then(res =>
+    this.getMarkers(this.distance, this.center.latitude, this.center.longitude )
+  )
 
 }
 
