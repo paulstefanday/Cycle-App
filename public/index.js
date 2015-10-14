@@ -287,7 +287,7 @@ var buf = [];
 var jade_mixins = {};
 var jade_interp;
 
-buf.push("<div id=\"home\" class=\"box\"><div class=\"logo\"><img src=\"public/logobig.png\" style=\"width: 360px;\"/></div><br/><button ng-if=\"!vm.isUser()\" ng-click=\"vm.authenticate('facebook')\" ladda-button=\"vm.laddaLoading\" data-style=\"expand-right\" class=\"ladda-button\">Login via Facebook</button></div>");;return buf.join("");
+buf.push("<div id=\"home\" class=\"box\"><div class=\"logo\"><img src=\"public/logobig.png\" style=\"max-width: 440px;width:100%;\"/></div><br/><button ng-if=\"!vm.isUser()\" ng-click=\"vm.authenticate('facebook')\" ladda-button=\"vm.laddaLoading\" data-style=\"expand-right\" class=\"ladda-button\">Login via Facebook</button></div>");;return buf.join("");
 };
 },{"jade/runtime":19}],7:[function(require,module,exports){
 Object.defineProperty(exports, "__esModule", {

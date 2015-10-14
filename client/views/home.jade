@@ -1,7 +1,7 @@
 #home.box
 
   .logo
-    img(src="public/logobig.png" style="width: 360px;")
+    img(src="public/logobig.png" style="max-width: 440px;width:100%;")
 
   br
 
@@ -10,3 +10,9 @@
   	ng-click="vm.authenticate('facebook')"
   	ladda-button="vm.laddaLoading"
   	data-style="expand-right") Login via Facebook
+
+  //- button.ladda-button(
+  //- 	ng-if="!vm.isUser()"
+  //- 	ng-click="vm.authenticate('facebook')"
+  //- 	ladda-button="vm.laddaLoading"
+  //- 	data-style="expand-right") Login via Email
