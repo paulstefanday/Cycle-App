@@ -1,0 +1,27 @@
+.map-report(ng-show="vm.reporting")
+	.box
+		button.ladda-button(
+			ng-click="vm.report('Crash')"
+			ladda-button="vm.laddaLoading"
+			data-style="expand-right") Crash
+
+		button.ladda-button(
+			ng-click="vm.report('Close Call')"
+			ladda-button="vm.laddaLoading"
+			data-style="expand-right") Close Call
+
+		br
+
+		button.ladda-button(
+			ng-click="vm.report('Verbal Abuse')"
+			ladda-button="vm.laddaLoading"
+			data-style="expand-right") Verbal Abuse
+
+		button.ladda-button(
+			ng-click="vm.report('Horn Abuse')"
+			ladda-button="vm.laddaLoading"
+			data-style="expand-right") Horn Abuse
+
+		br
+
+		button.ladda-button.button-light(ng-click="vm.reporting = false") Cancel

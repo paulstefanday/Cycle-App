@@ -1,30 +1,7 @@
-.map-report(ng-show="vm.reporting")
-	.box
-		button.ladda-button(
-			ng-click="vm.report('Accident')"
-			ladda-button="vm.laddaLoading"
-			data-style="expand-right") Accident
+include ./map.form.jade
 
-		button.ladda-button(
-			ng-click="vm.report('Close Call')"
-			ladda-button="vm.laddaLoading"
-			data-style="expand-right") Close Call
-
-		br
-
-		button.ladda-button(
-			ng-click="vm.report('Verbal Abuse')"
-			ladda-button="vm.laddaLoading"
-			data-style="expand-right") Verbal Abuse
-
-		button.ladda-button(
-			ng-click="vm.report('Horn Abuse')"
-			ladda-button="vm.laddaLoading"
-			data-style="expand-right") Horn Abuse
-
-		br
-
-		button.ladda-button(ng-click="vm.reporting = false") Cancel
+.box(ng-if="!vm.center")
+	h1 Loading Map
 
 button.report-button.ladda-button(
 	ng-click="vm.showReport()"
@@ -37,5 +14,4 @@ div( ng-if="vm.center" )
 			marker( on-mouseover="showInfoWindow(event, '{{marker.doc.id}}')" on-mouseout="hideInfoWindow(event, '{{marker.doc.id}}')" animation="DROP"  position="{{ marker.doc.latitude }}, {{marker.doc.longitude}}" )
 			info-window( id="{{marker.doc.id}}" max-width='400')
 				div(ng-non-bindable='' style="color:#333")
-					p Created at {{ marker.doc.createdAt | date }}
-					p Incident was classified as a "{{ marker.doc.type }}"
+					p {{ marker.doc.type }} at {{ marker.doc.createdAt | date:'medium' }}

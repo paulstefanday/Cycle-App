@@ -1,5 +1,7 @@
 rethinkdb_data/
 
+.env
+
 client/node_modules/
 
 *.pem

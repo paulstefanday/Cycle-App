@@ -44,33 +44,7 @@ h5 {
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f85032', endColorstr='#e73827', GradientType=1 );
  }
 
-button, .ladda-button {
-  margin-left:5px ;
-  margin-right:5px ;
-  background-color: @mainColor !important;
-  color: #fff ;
-  -webkit-box-shadow: 0 2px 1px 0 darken(@mainColor, 10%);
-  -moz-box-shadow:0 2px 1px 0 darken(@mainColor, 10%);
-  box-shadow: 0 2px 1px 0 darken(@mainColor, 10%);
-  border-bottom: 4px solid lighten(@mainColor, 10%) !important;
-  font-size: @textSize;
-  border-radius: 5px
-}
 
-button:hover, .ladda-button:hover {
-  margin-top: -2px;
-  background: darken(@mainColor, 5%);
-  -webkit-box-shadow: 0 5px 6px 0 darken(@mainColor, 10%);
-  -moz-box-shadow:0 5px 6px 0 darken(@mainColor, 10%);
-  box-shadow: 0 5px 6px 0 darken(@mainColor, 10%);
-}
-
-button:active, .ladda-button:active {
-  margin-top: 0px;
-  -webkit-box-shadow: 0 2px 1px 0 darken(@mainColor, 10%);
-  -moz-box-shadow:0 2px 1px 0 darken(@mainColor, 10%);
-  box-shadow: 0 2px 1px 0 darken(@mainColor, 10%);
-}
 
 .sweet-alert {
   button:hover {
@@ -110,6 +84,56 @@ button:active, .ladda-button:active {
   margin-top: -100px;
   position: absolute;
   text-align: center;
+}
+
+// Buttons
+
+button, .ladda-button {
+  margin-left:5px ;
+  margin-right:5px ;
+  background-color: @mainColor !important;
+  color: #fff ;
+  -webkit-box-shadow: 0 2px 1px 0 darken(@mainColor, 10%);
+  -moz-box-shadow:0 2px 1px 0 darken(@mainColor, 10%);
+  box-shadow: 0 2px 1px 0 darken(@mainColor, 10%);
+  border-bottom: 4px solid lighten(@mainColor, 10%) !important;
+  font-size: @textSize;
+  border-radius: 5px
+}
+
+button:hover, .ladda-button:hover {
+  margin-top: -2px;
+  background: darken(@mainColor, 5%);
+  -webkit-box-shadow: 0 5px 6px 0 darken(@mainColor, 10%);
+  -moz-box-shadow:0 5px 6px 0 darken(@mainColor, 10%);
+  box-shadow: 0 5px 6px 0 darken(@mainColor, 10%);
+}
+
+button:active, .ladda-button:active {
+  margin-top: 0px;
+  -webkit-box-shadow: 0 2px 1px 0 darken(@mainColor, 10%);
+  -moz-box-shadow:0 2px 1px 0 darken(@mainColor, 10%);
+  box-shadow: 0 2px 1px 0 darken(@mainColor, 10%);
+}
+
+.button-light {
+  background-color: lighten(@mainColor, 20%) !important;
+  box-shadow: 0 2px 1px 0 fade(lighten(@mainColor, 10%), 60%);
+  border-bottom: 4px solid lighten(@mainColor, 40%) !important;
+
+  &:hover {
+    box-shadow: 0 5px 6px 0 fade(lighten(@mainColor, 10%), 60%);
+  }
+}
+
+.button-danger {
+  background-color: @dangerColor !important;
+  box-shadow: 0 2px 1px 0 fade(darken(@dangerColor, 20%), 60%);
+  border-bottom: 4px solid lighten(@dangerColor, 20%) !important;
+
+  &:hover {
+    box-shadow: 0 5px 6px 0 fade(darken(@dangerColor, 20%), 60%);
+  }
 }
 
 

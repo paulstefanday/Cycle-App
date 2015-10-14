@@ -1,18 +1,18 @@
 .reports-page.container
-	h1 Reports
+	h1 Your Reports
 
 	.reports-edit(ng-if="vm.editing")
 		label Type
 		select(ng-model="vm.editing.type" ng-options="type as type for type in vm.types")
 
-		label Details
+		label Details about the incident
 		textarea(ng-model="vm.editing.details")
 
 		hr
 
 		button.ladda-button(ng-click="vm.update()") Update
-		button.ladda-button(ng-click="vm.delete()") Delete
-		button.ladda-button(ng-click="vm.editing = false") Cancel
+		button.ladda-button.button-danger(ng-click="vm.delete()") Delete
+		button.ladda-button.button-light(ng-click="vm.editing = false") Cancel
 
 	.row
 		a.item.reports-item(ng-repeat="report in vm.reports" ng-click="vm.edit(report)")

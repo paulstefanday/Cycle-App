@@ -1,16 +1,12 @@
 #home.box
 
   .logo
-    img(src="public/logo.png" style="margin-top:-40px;")
+    img(src="public/logobig.png" style="width: 360px;")
 
   br
 
-  //- h1 Welcome to Hit the breaks {{vm.user.name}}!
-
-  //- If not logged in
-  button.ladda-button(ng-if="!vm.isUser()" ng-click="vm.authenticate('facebook')" ladda-button="vm.laddaLoading" data-style="expand-right") Login via Facebook
-
-  //- If logged in
-  button.ladda-button(ng-if="vm.isUser()" ui-sref="report" ) Report
-
-  //- button.ladda-button(ui-sref="map") View Map
+  button.ladda-button(
+  	ng-if="!vm.isUser()"
+  	ng-click="vm.authenticate('facebook')"
+  	ladda-button="vm.laddaLoading"
+  	data-style="expand-right") Login via Facebook
