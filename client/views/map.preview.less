@@ -1,0 +1,45 @@
+
+.map-preview {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 100000000;
+	background-color: white;
+	text-align: center;
+
+	map {
+		width:100%;height:350px;
+	}
+
+	i {
+	    position: fixed;
+	    top: 10px;
+	    font-size: 30px;
+	    right: 10px;
+	    cursor: pointer;
+	    color: black;
+	}
+}
+
+
+@media (min-width: @tabletWidthMin) and (max-width: @tabletWidthMax) {
+
+	.map-preview {
+		map {
+			height:200px;
+		}
+	}
+
+}
+
+@media (max-width: @mobileWidth) {
+
+	.map-preview {
+		map {
+			height:150px;
+		}
+	}
+
+}

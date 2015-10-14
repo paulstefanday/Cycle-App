@@ -27,6 +27,10 @@ export default /*@ngInject*/ function ($scope, $q, $http, SweetAlert, $timeout) 
       .then(res => this.markers = res.data)
   }
 
+  this.view = (event, item) => {
+    this.preview = item.doc
+  }
+
   // Report
   this.showReport = () => this.reporting = true;
 

@@ -17,7 +17,7 @@
 	.row
 		a.item.reports-item(ng-repeat="report in vm.reports" ng-click="vm.edit(report)")
 
-			map( scrollwheel="false" style="width:100%;height:150px;" styles="{{vm.colours}}" zoom="14" center="{{ report.latitude }}, {{ report.longitude}}" draggable="false" dragging-cursor="pointer" disable-default-u-i="true" )
+			map( scrollwheel="false" style="width:100%;height:150px;" styles="{{vm.colours}}" zoom="16" center="{{ report.latitude }}, {{ report.longitude}}" draggable="false" dragging-cursor="pointer" disable-default-u-i="true" )
 				marker( animation="DROP"  position="{{ report.latitude }}, {{ report.longitude}}" )
 
 			.padding

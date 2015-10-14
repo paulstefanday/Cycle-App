@@ -1,5 +1,7 @@
 global.__base = __dirname + '/';
 
+if(!process.env.NODE_ENV) require('dotenv').load();
+
 var app = module.exports = require('koa')(),
     config = require(__base+'/api/config/config'),
     middleware = require(__base+'/api/config/middleware'),

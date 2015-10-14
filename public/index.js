@@ -300,7 +300,7 @@ exports["default"] = /*@ngInject*/["$auth", "$state", "SweetAlert", function ($a
 
   this.authenticate = function (provider) {
     $auth.authenticate(provider).then(function (res) {
-      SweetAlert.swal("Welcome", "Submit a report now!", "success");
+      SweetAlert.swal({ title: "Welcome", text: "Submit a report now!", timer: 1000, showConfirmButton: false });
       $state.go('map');
     });
   };
@@ -330,7 +330,7 @@ var colours = [{
   "featureType": "landscape",
   "elementType": "geometry.fill",
   "stylers": [{ "color": "#60dd8e" }]
-}, { "elementType": "labels", "stylers": [{ "visibility": "off" }] }, {
+}, {
   "elementType": "geometry.stroke",
   "stylers": [{ "visibility": "off" }]
 }, {
@@ -340,6 +340,35 @@ var colours = [{
 }, {}];
 
 exports.colours = colours;
+// var light = '#7ac6a2',
+//     dark = '#53b184',
+//     water = '#d3fbff',
+//     weight = 2; //
+
+// export var colours = [
+//   {"featureType":"all","elementType":"labels.text.fill","stylers":[{"color":"#ffffff"}]},
+//   {"featureType":"all","elementType":"labels.text.stroke","stylers":[{"color":dark}]},
+//   {"featureType":"all","elementType":"labels.icon","stylers":[{"visibility":"off"}]},
+//   {"featureType":"administrative","elementType":"geometry.fill","stylers":[{"color":light}]},
+//   {"featureType":"administrative","elementType":"geometry.stroke","stylers":[{"color":light},{"weight":weight}]},
+//   {"featureType":"administrative.locality","elementType":"geometry.fill","stylers":[{"lightness":"-1"}]},
+//   {"featureType":"administrative.neighborhood","elementType":"labels.text.fill","stylers":[{"lightness":"0"},{"saturation":"0"}]},
+//   {"featureType":"administrative.neighborhood","elementType":"labels.text.stroke","stylers":[{"weight":"0.01"}]},
+//   {"featureType":"administrative.land_parcel","elementType":"labels.text.stroke","stylers":[{"weight":"0.01"}]},
+//   {"featureType":"landscape","elementType":"geometry","stylers":[{"color":light}]},
+//   {"featureType":"poi","elementType":"geometry","stylers":[{"color":light}]},
+//   {"featureType":"road","elementType":"geometry.stroke","stylers":[{"visibility":"off"}]},
+//   {"featureType":"road.highway","elementType":"geometry.fill","stylers":[{"color":dark},{"weight":weight}]},
+//   {"featureType":"road.highway.controlled_access","elementType":"geometry.stroke","stylers":[{"color":dark},{"weight":weight}]},
+//   {"featureType":"road.arterial","elementType":"geometry","stylers":[{"color":dark},{"weight":weight}]},
+//   {"featureType":"road.local","elementType":"geometry","stylers":[{"color":dark},{"weight":weight}]},
+//   {"featureType":"transit","elementType":"geometry","stylers":[{"color":dark},{"weight":weight}]},
+//   {"featureType":"water","elementType":"geometry","stylers":[{"color":water}]}
+// ]
+
+// export var colours = [{"featureType":"water","elementType":"geometry","stylers":[{"color":"#193341"}]},{"featureType":"landscape","elementType":"geometry","stylers":[{"color":"#2c5a71"}]},{"featureType":"road","elementType":"geometry","stylers":[{"color":"#29768a"},{"lightness":-37}]},{"featureType":"poi","elementType":"geometry","stylers":[{"color":"#406d80"}]},{"featureType":"transit","elementType":"geometry","stylers":[{"color":"#406d80"}]},{"elementType":"labels.text.stroke","stylers":[{"visibility":"on"},{"color":"#3e606f"},{"weight":2},{"gamma":0.84}]},{"elementType":"labels.text.fill","stylers":[{"color":"#ffffff"}]},{"featureType":"administrative","elementType":"geometry","stylers":[{"weight":0.6},{"color":"#1a3541"}]},{"elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"featureType":"poi.park","elementType":"geometry","stylers":[{"color":"#2c5a71"}]}]
+// export var colours = [{"featureType":"water","elementType":"geometry","stylers":[{"color":"#193341"}]},{"featureType":"landscape","elementType":"geometry","stylers":[{"color":"#2c5a71"}]},{"featureType":"road","elementType":"geometry","stylers":[{"color":"#29768a"},{"lightness":-37}]},{"featureType":"poi","elementType":"geometry","stylers":[{"color":"#406d80"}]},{"featureType":"transit","elementType":"geometry","stylers":[{"color":"#406d80"}]},{"elementType":"labels.text.stroke","stylers":[{"visibility":"on"},{"color":"#3e606f"},{"weight":2},{"gamma":0.84}]},{"elementType":"labels.text.fill","stylers":[{"color":"#ffffff"}]},{"featureType":"administrative","elementType":"geometry","stylers":[{"weight":0.6},{"color":"#1a3541"}]},{"elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"featureType":"poi.park","elementType":"geometry","stylers":[{"color":"#2c5a71"}]}]
+
 var types = ['Crash', 'Close Call', 'Verbal Abuse', 'Horn Abuse'];
 exports.types = types;
 
@@ -351,7 +380,7 @@ var buf = [];
 var jade_mixins = {};
 var jade_interp;
 
-buf.push("<div ng-show=\"vm.reporting\" class=\"map-report\"><div class=\"box\"><button ng-click=\"vm.report('Crash')\" ladda-button=\"vm.laddaLoading\" data-style=\"expand-right\" class=\"ladda-button\">Crash</button><button ng-click=\"vm.report('Close Call')\" ladda-button=\"vm.laddaLoading\" data-style=\"expand-right\" class=\"ladda-button\">Close Call</button><br/><button ng-click=\"vm.report('Verbal Abuse')\" ladda-button=\"vm.laddaLoading\" data-style=\"expand-right\" class=\"ladda-button\">Verbal Abuse</button><button ng-click=\"vm.report('Horn Abuse')\" ladda-button=\"vm.laddaLoading\" data-style=\"expand-right\" class=\"ladda-button\">Horn Abuse</button><br/><button ng-click=\"vm.reporting = false\" class=\"ladda-button button-light\">Cancel</button></div></div><div ng-if=\"!vm.center\" class=\"box\"><h1>Loading Map</h1></div><button ng-click=\"vm.showReport()\" ladda-button=\"vm.laddaLoading\" data-style=\"expand-right\" class=\"report-button ladda-button\">Report</button><div ng-if=\"vm.center\"><map ng-style=\"vm.style\" zoom=\"14\" styles=\"{{vm.colours}}\" center=\"{{ vm.center.latitude }}, {{vm.center.longitude}}\" draggable=\"true\" dragging-cursor=\"move\" disable-default-u-i=\"true\"><div ng-repeat=\"marker in vm.markers track by marker.doc.id\"><marker on-mouseover=\"showInfoWindow(event, '{{marker.doc.id}}')\" on-mouseout=\"hideInfoWindow(event, '{{marker.doc.id}}')\" animation=\"DROP\" position=\"{{ marker.doc.latitude }}, {{marker.doc.longitude}}\"></marker><info-window id=\"{{marker.doc.id}}\" max-width=\"400\"><div ng-non-bindable=\"\" style=\"color:#333\"><p>{{ marker.doc.type }} at {{ marker.doc.createdAt | date:'medium' }}</p></div></info-window></div></map></div>");;return buf.join("");
+buf.push("<div ng-show=\"vm.reporting\" class=\"map-report\"><div class=\"box\"><button ng-click=\"vm.report('Crash')\" ladda-button=\"vm.laddaLoading\" data-style=\"expand-right\" class=\"ladda-button\">Crash</button><button ng-click=\"vm.report('Close Call')\" ladda-button=\"vm.laddaLoading\" data-style=\"expand-right\" class=\"ladda-button\">Close Call</button><br/><button ng-click=\"vm.report('Verbal Abuse')\" ladda-button=\"vm.laddaLoading\" data-style=\"expand-right\" class=\"ladda-button\">Verbal Abuse</button><button ng-click=\"vm.report('Horn Abuse')\" ladda-button=\"vm.laddaLoading\" data-style=\"expand-right\" class=\"ladda-button\">Horn Abuse</button><br/><button ng-click=\"vm.reporting = false\" class=\"ladda-button button-light\">Cancel</button></div></div><div ng-if=\"vm.preview\" class=\"map-preview\"><map scrollwheel=\"false\" styles=\"{{vm.colours}}\" zoom=\"15\" center=\"{{ vm.preview.latitude }}, {{ vm.preview.longitude }}\" draggable=\"false\" dragging-cursor=\"pointer\" disable-default-u-i=\"true\"><marker animation=\"DROP\" position=\"{{ vm.preview.latitude }}, {{ vm.preview.longitude}}\"></marker></map><div class=\"container\"><div class=\"padding\"><i ng-click=\"vm.preview = false\" class=\"ion-ios-close\"></i><h5>{{ vm.preview.type }}</h5><p>Reported at {{ vm.preview.createdAt | date:'medium' }}</p><p>{{ vm.preview.description }}</p></div></div></div><div ng-if=\"!vm.center\" class=\"box\"><h1>Loading Map</h1></div><button ng-click=\"vm.showReport()\" ladda-button=\"vm.laddaLoading\" data-style=\"slide-up\" class=\"report-button ladda-button\">Report</button><div ng-if=\"vm.center\"><map ng-style=\"vm.style\" zoom=\"15\" styles=\"{{vm.colours}}\" center=\"{{ vm.center.latitude }}, {{vm.center.longitude}}\" draggable=\"true\" dragging-cursor=\"move\" disable-default-u-i=\"true\"><div ng-repeat=\"marker in vm.markers track by marker.doc.id\"><marker on-click=\"vm.view(marker)\" on-mouseover=\"showInfoWindow(event, '{{marker.doc.id}}')\" on-mouseout=\"hideInfoWindow(event, '{{marker.doc.id}}')\" animation=\"DROP\" position=\"{{ marker.doc.latitude }}, {{marker.doc.longitude}}\"></marker><info-window id=\"{{marker.doc.id}}\" max-width=\"400\"><div ng-non-bindable=\"\" style=\"color:#333\"><p>{{ marker.doc.type }} at {{ marker.doc.createdAt | date:'medium' }}</p></div></info-window></div></map></div>");;return buf.join("");
 };
 },{"jade/runtime":20}],10:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
@@ -393,6 +422,10 @@ exports['default'] = /*@ngInject*/["$scope", "$q", "$http", "SweetAlert", "$time
     });
   };
 
+  this.view = function (event, item) {
+    _this.preview = item.doc;
+  };
+
   // Report
   this.showReport = function () {
     return _this.reporting = true;
@@ -429,7 +462,7 @@ var buf = [];
 var jade_mixins = {};
 var jade_interp;
 
-buf.push("<div class=\"reports-page container\"><h1>Your Reports</h1><div ng-if=\"vm.editing\" class=\"reports-edit\"><label>Type</label><select ng-model=\"vm.editing.type\" ng-options=\"type as type for type in vm.types\"></select><label>Details about the incident</label><textarea ng-model=\"vm.editing.details\"></textarea><hr/><button ng-click=\"vm.update()\" class=\"ladda-button\">Update</button><button ng-click=\"vm.delete()\" class=\"ladda-button button-danger\">Delete</button><button ng-click=\"vm.editing = false\" class=\"ladda-button button-light\">Cancel</button></div><div class=\"row\"><a ng-repeat=\"report in vm.reports\" ng-click=\"vm.edit(report)\" class=\"item reports-item\"><map scrollwheel=\"false\" style=\"width:100%;height:150px;\" styles=\"{{vm.colours}}\" zoom=\"14\" center=\"{{ report.latitude }}, {{ report.longitude}}\" draggable=\"false\" dragging-cursor=\"pointer\" disable-default-u-i=\"true\"><marker animation=\"DROP\" position=\"{{ report.latitude }}, {{ report.longitude}}\"></marker></map><div class=\"padding\"><h5>{{ report.type }}</h5><p>Reported at {{ report.createdAt | date }}</p></div></a></div></div>");;return buf.join("");
+buf.push("<div class=\"reports-page container\"><h1>Your Reports</h1><div ng-if=\"vm.editing\" class=\"reports-edit\"><label>Type</label><select ng-model=\"vm.editing.type\" ng-options=\"type as type for type in vm.types\"></select><label>Details about the incident</label><textarea ng-model=\"vm.editing.details\"></textarea><hr/><button ng-click=\"vm.update()\" class=\"ladda-button\">Update</button><button ng-click=\"vm.delete()\" class=\"ladda-button button-danger\">Delete</button><button ng-click=\"vm.editing = false\" class=\"ladda-button button-light\">Cancel</button></div><div class=\"row\"><a ng-repeat=\"report in vm.reports\" ng-click=\"vm.edit(report)\" class=\"item reports-item\"><map scrollwheel=\"false\" style=\"width:100%;height:150px;\" styles=\"{{vm.colours}}\" zoom=\"16\" center=\"{{ report.latitude }}, {{ report.longitude}}\" draggable=\"false\" dragging-cursor=\"pointer\" disable-default-u-i=\"true\"><marker animation=\"DROP\" position=\"{{ report.latitude }}, {{ report.longitude}}\"></marker></map><div class=\"padding\"><h5>{{ report.type }}</h5><p>Reported at {{ report.createdAt | date }}</p></div></a></div></div>");;return buf.join("");
 };
 },{"jade/runtime":20}],12:[function(require,module,exports){
 Object.defineProperty(exports, "__esModule", {

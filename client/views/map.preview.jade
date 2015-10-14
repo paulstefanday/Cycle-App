@@ -1,0 +1,12 @@
+.map-preview(ng-if="vm.preview")
+
+	map( scrollwheel="false" styles="{{vm.colours}}" zoom="15" center="{{ vm.preview.latitude }}, {{ vm.preview.longitude }}" draggable="false" dragging-cursor="pointer" disable-default-u-i="true" )
+		marker( animation="DROP"  position="{{ vm.preview.latitude }}, {{ vm.preview.longitude}}" )
+
+	.container
+		.padding
+			i.ion-ios-close(ng-click="vm.preview = false")
+			h5 {{ vm.preview.type }}
+			p Reported at {{ vm.preview.createdAt | date:'medium' }}
+			p {{ vm.preview.description }}
+
