@@ -32,5 +32,11 @@ export default /*@ngInject*/ function($stateProvider, $urlRouterProvider, $authP
       controller: require('./views/map.js'),
       template: require('./views/map.jade')
     })
+    .state('reports', {
+      url: "/reports",
+      controllerAs: 'vm',
+      controller: require('./views/reports.js'),
+      template: require('./views/reports.jade')
+    })
 }
 

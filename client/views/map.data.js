@@ -28,3 +28,9 @@ export var colours = [
   { }
 ];
 
+export var types = [
+  'Accident',
+  'Close Call',
+  'Verbal Abuse',
+  'Horn Abuse'
+]

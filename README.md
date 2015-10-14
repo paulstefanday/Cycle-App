@@ -22,9 +22,10 @@ NODE_ENV=prod PORT=3000 pm2 start server.js --node-args="--harmony"
 - update branding
 - add zoom controls
 - add search field or page?
-toggle by days or time
-color ur reports
+- toggle by days or time
+- convert location to addresses using google
 
+- color ur reports
 - get it working on mobile (iOS 6)
 - combine server/client config?
 - make gradient radial

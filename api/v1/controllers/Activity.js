@@ -3,21 +3,6 @@ var   config = require(__base+'/api/config/config'),
 	  thinky = require(__base+'/api/config/thinky.js'),
 	  r = thinky.r;
 
-
-/**
- * @api {get} /api/v1/activity Create
- * @apiName Create
- * @apiGroup Activity
- * @apiVersion 1.0.0
- *
- * @apiSuccess {String} id ID of user
- *
- * @apiSuccessExample Success-Response:
- *     HTTP/1.1 200 OK
- *     {}
- *
- */
-
 module.exports.create = function *() {
  	var body = this.request.body, record, result;
 
@@ -42,4 +27,24 @@ module.exports.findAll = function *() {
   // var userFilter = this.user ? {id: this.user.id } : {};
   // var data =   // { _apply: sequence => sequence.get }
   this.body = yield M.Activity.filter({}).getJoin({ user: true }).limit(200);
+}
+
+module.exports.getMe = function *() {
+  this.body = yield M.Activity.filter({ userId: this.user.id })
+}
+
+module.exports.updateMe = function *() {
+  var record = yield M.Activity.get(this.params.id)
+
+  if(record.userId !== this.user.id) this.throw(403, "You do not have access to this record")
+
+  this.body = yield M.Activity.get(this.params.id).update(this.request.body)
+}
+
+module.exports.deleteMe = function *() {
+  var record = yield M.Activity.filter({ userId: this.user.id, id: this.params.id }).delete()
+
+  if(record.deleted !== 1) this.throw(403, "Failed to delete record")
+
+  this.body = { success: true, id: this.params.id };
 }

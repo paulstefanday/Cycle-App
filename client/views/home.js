@@ -1,4 +1,4 @@
-export default /*@ngInject*/ function($auth, $state) {
+export default /*@ngInject*/ function($auth, $state, SweetAlert) {
 
 	this.authenticate = function(provider) {
     $auth.authenticate(provider).then(res => {

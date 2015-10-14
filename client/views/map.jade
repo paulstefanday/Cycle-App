@@ -33,7 +33,7 @@ button.report-button.ladda-button(
 
 div( ng-if="vm.center" )
 	map( ng-style="vm.style" zoom="14" styles="{{vm.colours}}" center="{{ vm.center.latitude }}, {{vm.center.longitude}}" draggable="true" dragging-cursor="move" disable-default-u-i="true" )
-		div(ng-repeat="marker in vm.markers track by marker.distance")
+		div(ng-repeat="marker in vm.markers track by marker.doc.id")
 			marker( on-mouseover="showInfoWindow(event, '{{marker.doc.id}}')" on-mouseout="hideInfoWindow(event, '{{marker.doc.id}}')" animation="DROP"  position="{{ marker.doc.latitude }}, {{marker.doc.longitude}}" )
 			info-window( id="{{marker.doc.id}}" max-width='400')
 				div(ng-non-bindable='' style="color:#333")

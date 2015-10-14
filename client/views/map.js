@@ -1,36 +1,30 @@
-import { style, colours, types } from './map.data';
+import { style, colours } from './map.data';
 
 export default /*@ngInject*/ function ($scope, $q, $http, SweetAlert, $timeout) {
 
 	this.markers = []
   this.style = style
   this.colours = colours
-  this.types = types
   this.distance = 3000
 
   // Map
   this.getGeo = () => {
     let q = $q.defer();
     navigator.geolocation.getCurrentPosition(pos => {
-      this.center = { latitude: pos.coords.latitude, longitude: pos.coords.longitude } || { latitude: -33.87, longitude: 151.2 };
+      this.center = { latitude: pos.coords.latitude, longitude: pos.coords.longitude }; // || { latitude: -33.87, longitude: 151.2 };
       q.resolve(this.center);
     }, error => { q.reject(error); });
     return q.promise;
   }
 
   $scope.$on('mapInitialized', (event, map) => {
-    map.addListener('mouseup', () => this.getMarkers(this.distance, map.center.J, map.center.M ) );
+    map.addListener('mouseup', () => this.getMarkers(this.distance, map.center.lat(), map.center.lng()) );
   });
 
   this.getMarkers = (distance, latitude, longitude) => {
-    $http.post(`/api/v1/activity/${distance}`, { latitude, longitude })
-      .then(res => {
-        let time = 0;
-        res.data.forEach(item => {
-          $timeout(() => this.markers.push(res.data[time]), time * 100)
-          time++
-        })
-      })
+    console.log({ latitude, longitude })
+    $http.post(`/api/v1/activity/geo/${distance}`, { latitude, longitude })
+      .then(res => this.markers = res.data)
   }
 
   // Report

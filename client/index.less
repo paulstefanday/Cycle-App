@@ -1,5 +1,9 @@
 @import '../node_modules/sweetalert/dist/sweetalert.css';
 
+html {
+  min-height: 100%;
+}
+
 body {
   color: #777;
   background: #9CC3FF;
@@ -17,6 +21,12 @@ h2 { font-size: 2em }
 h1, h2, h3, h4 {
   font-weight: 100;
   color: #fff;
+}
+
+h5 {
+  margin-top: 0;
+  font-size: 20px;
+  margin-bottom: -3px;
 }
 
 @smallPercent: 45%;
@@ -68,7 +78,29 @@ button:active, .ladda-button:active {
   }
 }
 
+.container {
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto;
+}
 
+.padding {
+  padding: 20px;
+  box-sizing: border-box;
+  width: 100%;
+  display: inline-block;
+}
+
+.row {
+  width: 102%;
+  margin-left: -@padding;
+  margin-right: -@padding;
+}
+
+.item {
+  width: 31.33%;
+  margin: 0 1% 10px 1%;
+}
 
 .box {
   width: 100%;
@@ -79,4 +111,48 @@ button:active, .ladda-button:active {
   position: absolute;
   text-align: center;
 }
+
+
+
+// Forms
+
+input, select, textarea {
+  box-sizing: border-box;
+  display:inline-block;
+  width: 100%;
+  margin-bottom: 1px;
+  padding: 0.4em .5em;
+  border-radius: 4px;
+  border:2px solid darken(white, 10%);
+  font-size: @textSize;
+  color: @mainColor;
+  -webkit-appearance: none;
+}
+
+input, select {
+  height: 40px;
+}
+
+textarea {
+  border-radius: 4px;
+  min-height: 200px;
+}
+
+hr {
+  border-top: 0px solid #000;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.24);
+  border-right: 0px solid #000;
+  border-left: 0px solid #000;
+}
+
+label {
+  font-weight: 600;
+  color: #A6A6A6;
+  text-transform: uppercase;
+  font-size: .6em;
+  letter-spacing: 0.1em;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
 

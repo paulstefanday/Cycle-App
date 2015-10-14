@@ -6,11 +6,16 @@ var router = require('koa-router');
 
 var api = new router();
 
-// Save activity
-api.get('/activity', activityCtrl.findAll);
+// My records
+api.get('/activity/me', activityCtrl.getMe);
+api.put('/activity/me/:id', activityCtrl.updateMe);
+api.delete('/activity/me/:id', activityCtrl.deleteMe);
 
+// Create new record
 api.post('/activity', user.is('logged in'), activityCtrl.create);
-api.post('/activity/:distance', activityCtrl.local);
+
+// Get records based on latitude/longitude
+api.post('/activity/geo/:distance', activityCtrl.local);
 
 // Auth Routes
 api.post('/facebook', authCtrl.facebook);
