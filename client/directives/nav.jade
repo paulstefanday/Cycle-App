@@ -8,9 +8,9 @@
     li
       a(href='#/' ng-click="vm.hide()") Home
     li
-      a(href='#/map' ng-click="vm.hide()") Map
+      a(href='#/map' ng-hide="!vm.loggedIn()"  ng-click="vm.hide()") Map
     li
-      a(href='#/reports' ng-click="vm.hide()") My Reports
+      a(href='#/reports' ng-hide="!vm.loggedIn()" ng-click="vm.hide()") My Reports
     li
       a(href='' ng-hide="vm.loggedIn()" ng-click="vm.login()") Login
     li

@@ -205,7 +205,7 @@ var buf = [];
 var jade_mixins = {};
 var jade_interp;
 
-buf.push("<div id=\"navigation\" ng-class=\"{ active : vm.showNav }\"><button ng-click=\"vm.showNav = !vm.showNav\" class=\"menu-link\"><i ng-hide=\"vm.showNav\" class=\"ion-navicon\"></i><i ng-show=\"vm.showNav\" class=\"ion-ios-close-empty\"></i></button><ul id=\"menu\"><li><a href=\"#/\" ng-click=\"vm.hide()\">Home</a></li><li><a href=\"#/map\" ng-click=\"vm.hide()\">Map</a></li><li><a href=\"#/reports\" ng-click=\"vm.hide()\">My Reports</a></li><li><a href=\"\" ng-hide=\"vm.loggedIn()\" ng-click=\"vm.login()\">Login</a></li><li><a href=\"\" ng-show=\"vm.loggedIn()\" ng-click=\"vm.logout()\">Logout</a></li></ul></div>");;return buf.join("");
+buf.push("<div id=\"navigation\" ng-class=\"{ active : vm.showNav }\"><button ng-click=\"vm.showNav = !vm.showNav\" class=\"menu-link\"><i ng-hide=\"vm.showNav\" class=\"ion-navicon\"></i><i ng-show=\"vm.showNav\" class=\"ion-ios-close-empty\"></i></button><ul id=\"menu\"><li><a href=\"#/\" ng-click=\"vm.hide()\">Home</a></li><li><a href=\"#/map\" ng-hide=\"!vm.loggedIn()\" ng-click=\"vm.hide()\">Map</a></li><li><a href=\"#/reports\" ng-hide=\"!vm.loggedIn()\" ng-click=\"vm.hide()\">My Reports</a></li><li><a href=\"\" ng-hide=\"vm.loggedIn()\" ng-click=\"vm.login()\">Login</a></li><li><a href=\"\" ng-show=\"vm.loggedIn()\" ng-click=\"vm.logout()\">Logout</a></li></ul></div>");;return buf.join("");
 };
 },{"jade/runtime":19}],4:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
