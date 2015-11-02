@@ -121,7 +121,7 @@ module.exports.login = function *() {
   var compare = yield bcrypt.compare(body.password, user[0].password);
   if (!compare) this.throw(401, "Incorrect details.");
 
-  this.body = { token: jwt.sign({id: user[0].id, email: user[0].email, name: user[0].first_name }, secret)  };
+  this.body = { token: jwt.sign({ id: user[0].id, email: user[0].email }, secret)  };
   this.status = 200;
 
 };

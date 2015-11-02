@@ -184,13 +184,23 @@ label {
   margin-bottom: 10px;
 }
 
-
+.mobile {
+  display: none;
+}
 
 @media (min-width: @tabletWidthMin) and (max-width: @tabletWidthMax) {
 
 }
 
 @media (max-width: @mobileWidth) {
+
+  .mobile {
+    display: block;
+  }
+
+  .desktop {
+    display: none;
+  }
 
   .item {
     width: 100%;

@@ -36,7 +36,7 @@ module.exports = {
 			password = yield this.hashPassword(realPassword);
 
 			// Update record
-			user = new M.User({email: data.email, password: password, first_name: data.first_name });
+			user = new M.User({email: data.email, password: password });
 			doc = yield user.save();
 
 			// Send an email to user with their password
